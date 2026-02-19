@@ -1,7 +1,15 @@
+//
+//  CreateOutingView.swift
+//  Tab
+//
+//  Created by Karachi Onwuanibe on 1/12/26.
+//
+
 import SwiftUI
 import PhotosUI
 import CoreLocation
 import UIKit
+
 
 // MARK: - Location Manager
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -25,16 +33,12 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 // MARK: - Create Outing View
 struct CreateOutingView: View {
 
+    @EnvironmentObject var draft: OutingDraft
     @Binding var path: NavigationPath
 
-    @State private var locationName: String = ""
-    @State private var outingDate: Date = Date()
     @FocusState private var isTextFieldFocused: Bool
-
-    @State private var selectedImage: UIImage? = nil
-    @State private var selectedIcon: String? = nil
     @State private var showImagePicker = false
-    @State private var photoItem: PhotosPickerItem? = nil
+    @State private var photoItem: PhotosPickerItem?
 
     let icons = [
         "mappin.circle.fill",
@@ -64,7 +68,7 @@ struct CreateOutingView: View {
 
                 // MARK: Visual Display
                 Group {
-                    if let image = selectedImage {
+                    if let image = draft.selectedImage {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
@@ -73,7 +77,7 @@ struct CreateOutingView: View {
                             .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
                             .onTapGesture { showImagePicker = true }
 
-                    } else if let iconName = selectedIcon {
+                    } else if let iconName = draft.selectedIcon {
                         Image(systemName: iconName)
                             .resizable()
                             .scaledToFit()
@@ -89,7 +93,7 @@ struct CreateOutingView: View {
                     }
                 }
                 .padding(.top, 40)
-                
+
 
                 // MARK: Icon Picker
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -99,14 +103,14 @@ struct CreateOutingView: View {
 
                             IconButton(
                                 icon: icon,
-                                isSelected: selectedIcon == icon,
+                                isSelected: draft.selectedIcon == icon,
                                 isPhotoIcon: index == icons.count - 1
                             ) {
                                 if index == icons.count - 1 {
                                     showImagePicker = true
                                 } else {
-                                    selectedIcon = icon
-                                    selectedImage = nil
+                                    draft.selectedIcon = icon
+                                    draft.selectedImage = nil
                                 }
                             }
                         }
@@ -119,7 +123,7 @@ struct CreateOutingView: View {
                     Image(systemName: "pencil.circle.fill")
                         .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
 
-                    TextField("Enter location name", text: $locationName)
+                    TextField("Enter location name", text: $draft.locationName)
                         .focused($isTextFieldFocused)
                         .submitLabel(.done)
                         .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -140,7 +144,7 @@ struct CreateOutingView: View {
 
                     DatePicker(
                         "",
-                        selection: $outingDate,
+                        selection: $draft.outingDate,
                         displayedComponents: [.date]
                     )
                     .datePickerStyle(.compact)
@@ -155,8 +159,10 @@ struct CreateOutingView: View {
 
                 Spacer()
 
-                // MARK: Continue Button
-                NavigationLink(destination: addFriendsDestination) {
+                // MARK: Continue → AddFriends (path-tracked)
+                Button {
+                    path.append("addFriends")
+                } label: {
                     Text("Continue")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity, maxHeight: 52)
@@ -199,31 +205,11 @@ struct CreateOutingView: View {
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    selectedImage = image
-                    selectedIcon = nil
+                    draft.selectedImage = image
+                    draft.selectedIcon = nil
                 }
             }
         }
-    }
-
-    // ✅ Separate destination for NavigationLink to help compiler
-    private var addFriendsDestination: some View {
-        let you = Friend(
-            name: "You",
-            contactInfo: nil,
-            owesAmount: 0,
-            isYou: true
-        )
-
-        return AddFriendsView(
-            initialFriends: [you],
-            restaurantName: locationName,
-            restaurantCoordinate: nil,
-            selectedImage: selectedImage,
-            selectedIcon: selectedIcon,
-            outingDate: $outingDate,
-            path: $path
-        )
     }
 }
 

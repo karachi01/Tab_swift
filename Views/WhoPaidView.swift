@@ -1,39 +1,25 @@
+//
+//  WhoPaidView.swift
+//  Tab
+//
+
 import SwiftUI
 import CoreLocation
 
 struct WhoPaidView: View {
-    @State var friends: [Friend]
+    @EnvironmentObject var draft: OutingDraft
+    @EnvironmentObject var tabManager: TabManager
+    @Binding var path: NavigationPath
+
+    @State private var friends: [Friend] = []
     @State private var totalBill: String = ""
-    @State private var payerID: UUID? = nil
+    @State private var payerID: UUID?
     @State private var showCustomSplit = false
     @State private var taxAmount: String = ""
     @State private var tipPercentage: String = ""
 
-    let restaurantName: String?
-    let selectedImage: UIImage?
-    let selectedIcon: String?
-    @Binding var outingDate: Date
-
-    @EnvironmentObject var tabManager: TabManager
-    @Binding var path: NavigationPath
-
+    
     @FocusState private var isKeyboardFocused: Bool
-
-    init(
-        friends: [Friend],
-        restaurantName: String?,
-        selectedImage: UIImage?,
-        selectedIcon: String?,
-        outingDate: Binding<Date>,
-        path: Binding<NavigationPath>
-    ) {
-        _friends = State(initialValue: friends)
-        self.restaurantName = restaurantName
-        self.selectedImage = selectedImage
-        self.selectedIcon = selectedIcon
-        _outingDate = outingDate
-        _path = path
-    }
 
     var body: some View {
         ZStack {
@@ -66,6 +52,12 @@ struct WhoPaidView: View {
         .navigationTitle("Bill Split")
         .navigationBarTitleDisplayMode(.inline)
         .onTapGesture { isKeyboardFocused = false }
+        .onAppear {
+            // Seed from draft on first appearance
+            if friends.isEmpty {
+                friends = draft.friends
+            }
+        }
         .navigationDestination(isPresented: $showCustomSplit) {
             CustomSplitView(
                 friends: $friends,
@@ -257,24 +249,26 @@ struct WhoPaidView: View {
         guard total > 0, payerID != nil else { return }
 
         let tab = Tab(
-            restaurantName: restaurantName ?? "Group Outing",
-            date: outingDate,
+            restaurantName: draft.locationName.isEmpty ? "Group Outing" : draft.locationName,
+            date: draft.outingDate,
             totalAmount: total,
             friends: friends,
-            imageData: selectedImage?.jpegData(compressionQuality: 0.8),
-            iconName: selectedIcon
+            imageData: draft.selectedImage?.jpegData(compressionQuality: 0.8),
+            iconName: draft.selectedIcon
         )
 
         tabManager.tabs.append(tab)
+        draft.reset()
 
-        // ✅ Force navigation stack to exactly ["home"]
+        // Dismiss CustomSplitView first (it was pushed via isPresented,
+        // so the NavigationPath doesn't know about it).
+        showCustomSplit = false
+
+        // Then pop the entire creation flow back to home.
         var newPath = NavigationPath()
         newPath.append("home")
         path = newPath
     }
-
-
-
 }
 
 // MARK: - Reusable Components

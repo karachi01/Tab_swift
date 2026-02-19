@@ -10,39 +10,12 @@ import CoreLocation
 import UIKit
 
 struct AddFriendsView: View {
-    @State private var friends: [Friend]
+    @EnvironmentObject var draft: OutingDraft
+    @EnvironmentObject var tabManager: TabManager
+    @Binding var path: NavigationPath
+
     @State private var newFriendName: String = ""
     @State private var newFriendContact: String = ""
-
-    @Binding var path: NavigationPath
-    @EnvironmentObject var tabManager: TabManager
-
-    let restaurantName: String?
-    let restaurantCoordinate: CLLocationCoordinate2D?
-
-    let selectedImage: UIImage?
-    let selectedIcon: String?
-    @Binding var outingDate: Date // ✅ CHANGED
-
-    
-
-    init(
-        initialFriends: [Friend],
-        restaurantName: String?,
-        restaurantCoordinate: CLLocationCoordinate2D?,
-        selectedImage: UIImage?,
-        selectedIcon: String?,
-        outingDate: Binding<Date>,               // <-- Added this
-        path: Binding<NavigationPath>
-    ) {
-        _friends = State(initialValue: initialFriends)
-        self.restaurantName = restaurantName
-        self.restaurantCoordinate = restaurantCoordinate
-        self.selectedImage = selectedImage
-        self.selectedIcon = selectedIcon
-        _outingDate = outingDate     // <-- Assign the passed parameter
-        _path = path
-    }
 
     var body: some View {
         ZStack {
@@ -78,7 +51,7 @@ struct AddFriendsView: View {
                 // MARK: Friends Scroll
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(friends) { friend in
+                        ForEach(draft.friends) { friend in
                             HStack(spacing: 6) {
                                 Text(friend.isYou ? "You" : friend.name)
                                     .lineLimit(1)
@@ -92,7 +65,7 @@ struct AddFriendsView: View {
 
                                 if !friend.isYou {
                                     Button {
-                                        friends.removeAll { $0.id == friend.id }
+                                        draft.friends.removeAll { $0.id == friend.id }
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .foregroundStyle(.blue)
@@ -150,17 +123,9 @@ struct AddFriendsView: View {
 
                 Spacer()
 
-                // MARK: Continue → WhoPaidView
-                NavigationLink {
-                    WhoPaidView(
-                        friends: friends,
-                        restaurantName: restaurantName,
-                        selectedImage: selectedImage,
-                        selectedIcon: selectedIcon,
-                        outingDate: $outingDate, // ✅ Pass the outing date
-                        path: $path
-                    )
-                    .environmentObject(tabManager)
+                // MARK: Continue → WhoPaidView (path-tracked)
+                Button {
+                    path.append("whoPaid")
                 } label: {
                     Text("Continue")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -191,7 +156,7 @@ struct AddFriendsView: View {
         let trimmed = newFriendName.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
 
-        friends.append(
+        draft.friends.append(
             Friend(
                 name: trimmed,
                 contactInfo: newFriendContact.isEmpty ? nil : newFriendContact

@@ -1,7 +1,13 @@
+//
+//  ContentView.swift
+//  Tab
+//
+
 import SwiftUI
 
 struct ContentView: View {
     @StateObject private var tabManager = TabManager()
+    @StateObject private var draft = OutingDraft()
     @State private var path = NavigationPath()
 
     // Global toast state
@@ -17,11 +23,15 @@ struct ContentView: View {
                         switch route {
                         case "home":
                             HomeView(path: $path)
-                                .environmentObject(tabManager)
 
                         case "create":
                             CreateOutingView(path: $path)
-                                .environmentObject(tabManager)
+
+                        case "addFriends":
+                            AddFriendsView(path: $path)
+
+                        case "whoPaid":
+                            WhoPaidView(path: $path)
 
                         default:
                             EmptyView()
@@ -30,7 +40,6 @@ struct ContentView: View {
 
                     .navigationDestination(for: UUID.self) { tabID in
                         TabDetailView(tabID: tabID, path: $path)
-                            .environmentObject(tabManager)
                     }
 
                     .navigationDestination(for: EditTabPath.self) { editPath in
@@ -41,13 +50,13 @@ struct ContentView: View {
                                 showToast: $showToast,
                                 toastMessage: $toastMessage
                             )
-                            .environmentObject(tabManager)
                         } else {
                             Text("Tab not found")
                         }
                     }
             }
             .environmentObject(tabManager)
+            .environmentObject(draft)
 
             // MARK: - GLOBAL TOAST OVERLAY
             VStack {

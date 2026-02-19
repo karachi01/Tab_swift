@@ -4,11 +4,12 @@
 //
 //  Created by Karachi Onwuanibe on 1/24/26.
 //
+
 import SwiftUI
 
 struct CustomSplitView: View {
     @Binding var friends: [Friend]
-    let totalBill: Double   // This already includes tax & tip from previous screen
+    let totalBill: Double   // Already includes tax & tip from previous screen
     let onConfirm: () -> Void
 
     @FocusState private var isKeyboardFocused: Bool
@@ -20,12 +21,12 @@ struct CustomSplitView: View {
                 // MARK: Header
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Custom Split / Tip")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .font(.system(size: 32, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
                     Text("Each person can enter what they paid and their own tip.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                 }
                 .padding(.horizontal)
 
@@ -71,8 +72,8 @@ struct CustomSplitView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color(.systemBackground))
-                                    .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+                                    .fill(Color.white.opacity(0.95))
+                                    .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
                             )
                         }
                     }
@@ -102,7 +103,8 @@ struct CustomSplitView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemGray6))
+                        .fill(Color.white.opacity(0.95))
+                        .shadow(color: Color.black.opacity(0.08), radius: 6, y: 3)
                 )
                 .padding(.horizontal)
 
@@ -112,12 +114,22 @@ struct CustomSplitView: View {
                     onConfirm()
                 } label: {
                     Text("Confirm Custom Split")
-                        .fontWeight(.semibold)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 70/255, green: 140/255, blue: 125/255),
+                                    Color(red: 110/255, green: 180/255, blue: 160/255)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                         .foregroundStyle(.white)
-                        .cornerRadius(18)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 32)
@@ -132,7 +144,7 @@ struct CustomSplitView: View {
         }
     }
 
-    // MARK: Logic (FIXED)
+    // MARK: Logic
 
     private var fairShare: Double {
         friends.isEmpty ? 0 : totalBill / Double(friends.count)
@@ -142,8 +154,6 @@ struct CustomSplitView: View {
         for i in friends.indices {
             let contributed = friends[i].paidAmount + friends[i].customTip
             let net = contributed - fairShare
-
-            // owesAmount should represent how much this person still owes
             friends[i].owesAmount = max(-net, 0)
         }
     }

@@ -20,8 +20,9 @@ enum HomeDisplayMode {
 
 struct HomeView: View {
     @EnvironmentObject var tabManager: TabManager
+    @EnvironmentObject var draft: OutingDraft
     @Binding var path: NavigationPath
-    
+
     @State private var selectedSection: HomeTabSection = .active
     @State private var displayMode: HomeDisplayMode = .list
     @State private var expandedMonths: Set<String> = []
@@ -83,10 +84,11 @@ struct HomeView: View {
 
             BottomTabsBar(selected: $selectedSection)
 
-            // Floating Button
+            // MARK: Floating "+" Button — now path-tracked
             if selectedSection == .active {
-                NavigationLink {
-                    CreateOutingView(path: $path)
+                Button {
+                    draft.reset()
+                    path.append("create")
                 } label: {
                     ZStack {
                         Circle()
@@ -159,7 +161,7 @@ private extension HomeView {
         .padding(.horizontal)
     }
 
-    // MARK: Monthly Grouping (SAFE + NO LOGIC CHANGE)
+    // MARK: Monthly Grouping
 
     var monthlyFolders: some View {
         let grouped = Dictionary(grouping: filteredTabs) {
@@ -259,7 +261,10 @@ private extension HomeView {
             .lineSpacing(4)
 
             if selectedSection == .active {
-                NavigationLink(value: "create") {
+                Button {
+                    draft.reset()
+                    path.append("create")
+                } label: {
                     Text("Start a Tab")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
@@ -302,6 +307,7 @@ private extension HomeView {
 
             if selectedSection == .active {
                 Button {
+                    draft.reset()
                     path.append("create")
                 } label: {
                     HStack {
