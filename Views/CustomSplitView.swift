@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CustomSplitView: View {
     @Binding var friends: [Friend]
-    let totalBill: Double   // Already includes tax & tip from previous screen
-    let onConfirm: () -> Void
+
+    let initialTotal: Double
+
+    let onConfirm: (Double) -> Void
 
     @FocusState private var isKeyboardFocused: Bool
 
@@ -94,9 +96,9 @@ struct CustomSplitView: View {
                     Divider()
 
                     HStack {
-                        Text("Total Bill")
+                        Text("New Total")
                         Spacer()
-                        Text("$\(totalBill, specifier: "%.2f")")
+                        Text("$\(customTotal, specifier: "%.2f")")
                             .fontWeight(.semibold)
                     }
                 }
@@ -111,7 +113,7 @@ struct CustomSplitView: View {
                 // MARK: Confirm
                 Button {
                     calculateOwes()
-                    onConfirm()
+                    onConfirm(customTotal)
                 } label: {
                     Text("Confirm Custom Split")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -146,8 +148,14 @@ struct CustomSplitView: View {
 
     // MARK: Logic
 
+
+    private var customTotal: Double {
+        friends.reduce(0) { $0 + $1.paidAmount + $1.customTip }
+    }
+
+
     private var fairShare: Double {
-        friends.isEmpty ? 0 : totalBill / Double(friends.count)
+        friends.isEmpty ? 0 : customTotal / Double(friends.count)
     }
 
     private func calculateOwes() {

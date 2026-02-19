@@ -178,9 +178,9 @@ struct EditTabView: View {
         .navigationDestination(isPresented: $showCustomSplit) {
             CustomSplitView(
                 friends: $tab.friends,
-                totalBill: totalWithTaxAndTip
-            ) {
-                saveEdits()
+                initialTotal: totalWithTaxAndTip
+            ) { customTotal in
+                saveEdits(overrideTotal: customTotal)
             }
         }
     }
@@ -230,8 +230,11 @@ struct EditTabView: View {
         }
     }
 
-    private func saveEdits() {
-        tab.totalAmount = totalWithTaxAndTip
+    /// - Parameter overrideTotal: When coming from CustomSplitView, use the sum
+    ///   of what everyone actually entered. Falls back to `totalWithTaxAndTip`
+    ///   for the normal "Save Changes" path.
+    private func saveEdits(overrideTotal: Double? = nil) {
+        tab.totalAmount = overrideTotal ?? totalWithTaxAndTip
         tabManager.update(tab: tab)
 
         toastMessage = "Changes saved"

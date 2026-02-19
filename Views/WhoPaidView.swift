@@ -61,9 +61,10 @@ struct WhoPaidView: View {
         .navigationDestination(isPresented: $showCustomSplit) {
             CustomSplitView(
                 friends: $friends,
-                totalBill: totalWithTaxAndTip
-            ) {
-                confirmAndSave()
+                initialTotal: totalWithTaxAndTip
+            ) { customTotal in
+                // Use the custom-entered total (sum of what everyone paid + tipped)
+                confirmAndSave(overrideTotal: customTotal)
             }
         }
     }
@@ -244,8 +245,11 @@ struct WhoPaidView: View {
         }
     }
 
-    private func confirmAndSave() {
-        let total = totalWithTaxAndTip
+    /// - Parameter overrideTotal: When coming from CustomSplitView, use the sum
+    ///   of what everyone actually entered. Falls back to `totalWithTaxAndTip`
+    ///   for the normal "Confirm & Save" path.
+    private func confirmAndSave(overrideTotal: Double? = nil) {
+        let total = overrideTotal ?? totalWithTaxAndTip
         guard total > 0, payerID != nil else { return }
 
         let tab = Tab(
