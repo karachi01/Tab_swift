@@ -9,12 +9,29 @@ import SwiftUI
 
 struct CustomSplitView: View {
     @Binding var friends: [Friend]
-
     let initialTotal: Double
-
     let onConfirm: (Double) -> Void
 
+    @State private var sharedTax: String = ""
+
     @FocusState private var isKeyboardFocused: Bool
+
+    // Each person's equal share of the shared tax
+    private var taxPerPerson: Double {
+        let tax = Double(sharedTax) ?? 0
+        guard friends.count > 0 else { return 0 }
+        return tax / Double(friends.count)
+    }
+
+    // Individual total: amount + tip + their tax share
+    private func subtotal(for friend: Friend) -> Double {
+        friend.paidAmount + friend.customTip + taxPerPerson
+    }
+
+    // Grand total across everyone
+    private var customTotal: Double {
+        friends.reduce(0) { $0 + subtotal(for: $1) }
+    }
 
     var body: some View {
         ScrollView {
@@ -26,33 +43,35 @@ struct CustomSplitView: View {
                         .font(.system(size: 32, weight: .heavy, design: .rounded))
                         .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
-                    Text("Each person can enter what they paid and their own tip.")
+                    Text("Enter each person's amount and tip. Add a shared tax to split it equally.")
                         .font(.system(size: 17, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                 }
                 .padding(.horizontal)
 
-                // MARK: Paid + Tip Inputs
+                // MARK: Per-Person Inputs
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Who paid & tipped?")
+                    Text("Individual Amounts")
                         .font(.headline)
+                        .padding(.horizontal)
 
                     VStack(spacing: 12) {
                         ForEach($friends) { $friend in
                             VStack(alignment: .leading, spacing: 10) {
 
-                                HStack {
-                                    Text(friend.isYou ? "You" : friend.name)
-                                        .fontWeight(.medium)
-                                    Spacer()
-                                }
+                                Text(friend.isYou ? "You" : friend.name)
+                                    .fontWeight(.semibold)
 
                                 HStack {
-                                    Text("Paid")
+                                    Text("Amount")
+                                        .foregroundStyle(.secondary)
                                     Spacer()
+                                    Text("$")
+                                        .foregroundStyle(.secondary)
                                     TextField("0.00", value: $friend.paidAmount, format: .number)
                                         .keyboardType(.decimalPad)
-                                        .frame(width: 110)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 100)
                                         .padding(8)
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
@@ -61,14 +80,29 @@ struct CustomSplitView: View {
 
                                 HStack {
                                     Text("Tip")
+                                        .foregroundStyle(.secondary)
                                     Spacer()
+                                    Text("$")
+                                        .foregroundStyle(.secondary)
                                     TextField("0.00", value: $friend.customTip, format: .number)
                                         .keyboardType(.decimalPad)
-                                        .frame(width: 110)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 100)
                                         .padding(8)
                                         .background(Color(.systemGray6))
                                         .cornerRadius(10)
                                         .focused($isKeyboardFocused)
+                                }
+
+                                // Subtotal before shared tax
+                                HStack {
+                                    Text("Subtotal")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text("$\(String(format: "%.2f", friend.paidAmount + friend.customTip))")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                             .padding()
@@ -79,28 +113,68 @@ struct CustomSplitView: View {
                             )
                         }
                     }
+                    .padding(.horizontal)
+                }
+
+                // MARK: Shared Tax
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Shared Tax (Optional)")
+                        .font(.headline)
+
+                    Text("Enter the bill's total tax — it will be split equally among everyone.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    HStack {
+                        Text("$")
+                            .foregroundStyle(.secondary)
+                        TextField("0.00", text: $sharedTax)
+                            .keyboardType(.decimalPad)
+                            .focused($isKeyboardFocused)
+                    }
+                    .padding(.horizontal, 12)
+                    .frame(height: 44)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.95))
+                            .shadow(color: Color.black.opacity(0.08), radius: 6, y: 3)
+                    )
+
+                    if (Double(sharedTax) ?? 0) > 0 {
+                        Text("Each person's tax share: $\(String(format: "%.2f", taxPerPerson))")
+                            .font(.caption)
+                            .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
+                    }
                 }
                 .padding(.horizontal)
 
                 // MARK: Summary
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text("Summary")
                         .font(.headline)
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: 8) {
                         ForEach(friends) { friend in
-                            SummaryRow(friend: friend, fairShare: fairShare)
+                            HStack {
+                                Text(friend.isYou ? "You" : friend.name)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Text("$\(String(format: "%.2f", subtotal(for: friend)))")
+                                    .fontWeight(.semibold)
+                            }
+                            Divider()
                         }
                     }
 
-                    Divider()
-
                     HStack {
-                        Text("New Total")
+                        Text("Total")
+                            .fontWeight(.bold)
                         Spacer()
-                        Text("$\(customTotal, specifier: "%.2f")")
-                            .fontWeight(.semibold)
+                        Text("$\(String(format: "%.2f", customTotal))")
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
                     }
+                    .padding(.top, 4)
                 }
                 .padding()
                 .background(
@@ -112,7 +186,11 @@ struct CustomSplitView: View {
 
                 // MARK: Confirm
                 Button {
-                    calculateOwes()
+                    isKeyboardFocused = false
+                    // Store each person's individual total for record-keeping
+                    for i in friends.indices {
+                        friends[i].owesAmount = subtotal(for: friends[i])
+                    }
                     onConfirm(customTotal)
                 } label: {
                     Text("Confirm Custom Split")
@@ -140,69 +218,5 @@ struct CustomSplitView: View {
         .navigationTitle("Custom Split")
         .navigationBarTitleDisplayMode(.inline)
         .onTapGesture { isKeyboardFocused = false }
-        .onAppear { calculateOwes() }
-        .onChange(of: friends) { _ in
-            calculateOwes()
-        }
-    }
-
-    // MARK: Logic
-
-
-    private var customTotal: Double {
-        friends.reduce(0) { $0 + $1.paidAmount + $1.customTip }
-    }
-
-
-    private var fairShare: Double {
-        friends.isEmpty ? 0 : customTotal / Double(friends.count)
-    }
-
-    private func calculateOwes() {
-        for i in friends.indices {
-            let contributed = friends[i].paidAmount + friends[i].customTip
-            let net = contributed - fairShare
-            friends[i].owesAmount = max(-net, 0)
-        }
-    }
-}
-
-struct SummaryRow: View {
-    let friend: Friend
-    let fairShare: Double
-
-    private var net: Double {
-        (friend.paidAmount + friend.customTip) - fairShare
-    }
-
-    private var displayText: String {
-        if abs(net) < 0.01 {
-            return "Settled"
-        } else if net > 0 {
-            return "+$\(String(format: "%.2f", net))"
-        } else {
-            return "-$\(String(format: "%.2f", abs(net)))"
-        }
-    }
-
-    private var displayColor: Color {
-        if abs(net) < 0.01 {
-            return .secondary
-        } else if net > 0 {
-            return .green
-        } else {
-            return .red
-        }
-    }
-
-    var body: some View {
-        HStack {
-            Text(friend.isYou ? "You" : friend.name)
-                .fontWeight(.medium)
-            Spacer()
-            Text(displayText)
-                .fontWeight(.semibold)
-                .foregroundStyle(displayColor)
-        }
     }
 }
