@@ -18,7 +18,6 @@ struct WhoPaidView: View {
     @State private var taxAmount: String = ""
     @State private var tipPercentage: String = ""
 
-    
     @FocusState private var isKeyboardFocused: Bool
 
     var body: some View {
@@ -53,7 +52,6 @@ struct WhoPaidView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onTapGesture { isKeyboardFocused = false }
         .onAppear {
-            // Seed from draft on first appearance
             if friends.isEmpty {
                 friends = draft.friends
             }
@@ -63,8 +61,9 @@ struct WhoPaidView: View {
                 friends: $friends,
                 initialTotal: totalWithTaxAndTip
             ) { customTotal in
-                // Use the custom-entered total (sum of what everyone paid + tipped)
-                confirmAndSave(overrideTotal: customTotal)
+                // Coming from CustomSplitView — bypass the WhoPaidView guards
+                // and save directly with the custom total.
+                saveTab(total: customTotal)
             }
         }
     }
@@ -192,6 +191,7 @@ struct WhoPaidView: View {
     }
 
     // MARK: Confirm Button
+    // Only shown / enabled when the user fills in WhoPaidView fields directly.
     private var confirmButton: some View {
         Button {
             isKeyboardFocused = false
@@ -224,6 +224,8 @@ struct WhoPaidView: View {
     }
 
     // MARK: Helpers
+
+    /// Enabled only when the user has filled in WhoPaidView directly.
     private var canConfirm: Bool {
         Double(totalBill) != nil && payerID != nil
     }
@@ -245,12 +247,17 @@ struct WhoPaidView: View {
         }
     }
 
-    /// - Parameter overrideTotal: When coming from CustomSplitView, use the sum
-    ///   of what everyone actually entered. Falls back to `totalWithTaxAndTip`
-    ///   for the normal "Confirm & Save" path.
-    private func confirmAndSave(overrideTotal: Double? = nil) {
-        let total = overrideTotal ?? totalWithTaxAndTip
-        guard total > 0, payerID != nil else { return }
+    /// Called by the "Confirm & Save" button — requires WhoPaidView fields to be filled.
+    private func confirmAndSave() {
+        guard canConfirm else { return }
+        saveTab(total: totalWithTaxAndTip)
+    }
+
+    /// Core save logic — no guards on WhoPaidView fields so CustomSplitView
+    /// can call this directly with its own total, even if totalBill / payerID
+    /// were never set on this screen.
+    private func saveTab(total: Double) {
+        guard total > 0 else { return }
 
         let tab = Tab(
             restaurantName: draft.locationName.isEmpty ? "Group Outing" : draft.locationName,
@@ -264,11 +271,8 @@ struct WhoPaidView: View {
         tabManager.tabs.append(tab)
         draft.reset()
 
-        // Dismiss CustomSplitView first (it was pushed via isPresented,
-        // so the NavigationPath doesn't know about it).
         showCustomSplit = false
 
-        // Then pop the entire creation flow back to home.
         var newPath = NavigationPath()
         newPath.append("home")
         path = newPath
