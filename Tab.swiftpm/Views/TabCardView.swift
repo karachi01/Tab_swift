@@ -31,11 +31,11 @@ struct TabCardView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(tab.restaurantName)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(.headline, design: .rounded))
                         .foregroundColor(.white)
 
                     Text(tab.date.formatted(date: .abbreviated, time: .omitted))
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.system(.caption, design: .rounded, weight: .medium))
                         .foregroundColor(.white.opacity(0.9))
                 }
                 .padding()
@@ -44,18 +44,18 @@ struct TabCardView: View {
             // MARK: Details
             VStack(alignment: .leading, spacing: 8) {
                 Text("Total Amount")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(.caption, design: .rounded, weight: .medium))
                     .foregroundStyle(.secondary)
 
                 Text(tab.totalAmount, format: .currency(code: "USD"))
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .font(.system(.title3, design: .rounded, weight: .semibold))
 
                 Text("People")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(.caption, design: .rounded, weight: .medium))
                     .foregroundStyle(.secondary)
 
                 Text(tab.friends.map { $0.name }.joined(separator: ", "))
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded, weight: .medium))
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

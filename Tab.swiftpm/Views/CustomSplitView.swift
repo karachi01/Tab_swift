@@ -41,11 +41,11 @@ struct CustomSplitView: View {
                     // MARK: Header
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Custom Split / Tip")
-                            .font(.system(size: 32, weight: .heavy, design: .rounded))
+                            .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                             .foregroundStyle(Color(.label))
 
                         Text("Enter each person's amount and tip. Add a shared tax to split it equally.")
-                            .font(.system(size: 17, weight: .medium, design: .rounded))
+                            .font(.system(.body, design: .rounded, weight: .medium))
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                     .padding(.horizontal)
@@ -203,7 +203,7 @@ struct CustomSplitView: View {
                         onConfirm(customTotal)
                     } label: {
                         Text("Confirm Custom Split")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(.headline, design: .rounded))
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(

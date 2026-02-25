@@ -46,11 +46,11 @@ struct TabDetailView: View {
 
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(tab.restaurantName)
-                                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                                    .font(.system(.title, design: .rounded, weight: .heavy))
                                     .foregroundColor(.white)
 
                                 Text(tab.date.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                                    .font(.system(.footnote, design: .rounded, weight: .medium))
                                     .foregroundColor(.white.opacity(0.9))
                             }
                             .padding()
@@ -62,26 +62,26 @@ struct TabDetailView: View {
                         // MARK: Breakdown Card
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Breakdown")
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .font(.system(.title3, design: .rounded, weight: .semibold))
                                 .foregroundStyle(Color(.label))
                                 .padding(.horizontal)
 
                             ForEach(tab.friends) { friend in
                                 HStack(spacing: 12) {
                                     Text(friend.isYou ? "You" : friend.name)
-                                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                                        .font(.system(.callout, design: .rounded, weight: .medium))
                                         .foregroundStyle(Color(.label))
 
                                     Spacer()
 
                                     Text(friend.owesAmount, format: .currency(code: "USD"))
-                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .font(.system(.callout, design: .rounded, weight: .semibold))
                                         .foregroundStyle(friend.owesAmount == 0 ? .green : Color(.label))
 
                                     if !friend.isYou && friend.owesAmount > 0 {
                                         if tab.hasReminded(friendID: friend.id) {
                                             Label("Sent", systemImage: "checkmark.circle.fill")
-                                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                                .font(.system(.caption, design: .rounded, weight: .medium))
                                                 .foregroundStyle(.green)
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 6)
@@ -97,7 +97,7 @@ struct TabDetailView: View {
                                                 )
                                             } label: {
                                                 Label("Remind", systemImage: "bell.fill")
-                                                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                                    .font(.system(.caption, design: .rounded, weight: .semibold))
                                                     .foregroundStyle(.white)
                                                     .padding(.horizontal, 12)
                                                     .padding(.vertical, 6)
@@ -125,11 +125,11 @@ struct TabDetailView: View {
                         // MARK: Total Card
                         HStack {
                             Text("Total")
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                .font(.system(.headline, design: .rounded))
                                 .foregroundStyle(Color(.label))
                             Spacer()
                             Text(tab.totalAmount, format: .currency(code: "USD"))
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .font(.system(.headline, design: .rounded, weight: .bold))
                                 .foregroundStyle(Color(.label))
                         }
                         .padding()
@@ -174,11 +174,11 @@ struct TabDetailView: View {
 
                                 if !tab.isSettled && showSettledCheck {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: 28, weight: .semibold, design: .rounded))
+                                        .font(.system(.title, design: .rounded, weight: .semibold))
                                         .foregroundStyle(.white)
                                 } else {
                                     Text(tab.isSettled ? "Mark as Active" : "Mark as Settled")
-                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                        .font(.system(.headline, design: .rounded))
                                         .foregroundStyle(.white)
                                 }
                             }
@@ -191,7 +191,7 @@ struct TabDetailView: View {
                             path.append(EditTabPath(tabID: tabID))
                         } label: {
                             Text("Edit Tab")
-                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                .font(.system(.headline, design: .rounded))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.green.opacity(0.15))
@@ -205,7 +205,7 @@ struct TabDetailView: View {
                             showDeleteConfirmation = true
                         } label: {
                             Text("Delete Tab")
-                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                .font(.system(.headline, design: .rounded))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.red.opacity(0.15))

@@ -67,11 +67,11 @@ struct WhoPaidView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Who Paid?")
-                .font(.system(size: 32, weight: .heavy, design: .rounded))
+                .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                 .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
             Text("Enter the bill details and select who paid.")
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(.system(.body, design: .rounded, weight: .medium))
                 .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
         }
         .padding(.horizontal)
@@ -170,7 +170,7 @@ struct WhoPaidView: View {
                             Spacer()
                             Image(systemName: payerID == friend.id ? "checkmark.circle.fill" : "circle")
                                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
-                                .font(.system(size: 22))
+                                .font(.system(.title2))
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -250,7 +250,7 @@ struct WhoPaidView: View {
             confirmAndSave()
         } label: {
             Text("Confirm & Save")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .font(.system(.headline, design: .rounded))
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
@@ -365,7 +365,7 @@ struct GradientButton: View {
                 Text(title)
                 if let icon = icon { Spacer(); Image(systemName: icon) }
             }
-            .font(.system(size: 17, weight: .semibold, design: .rounded))
+            .font(.system(.headline, design: .rounded))
             .padding()
             .frame(maxWidth: .infinity)
             .background(

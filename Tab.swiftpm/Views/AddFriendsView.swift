@@ -28,11 +28,11 @@ struct AddFriendsView: View {
                         // MARK: Header
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Add Friends")
-                                .font(.system(size: 32, weight: .heavy, design: .rounded))
+                                .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                                 .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
                             Text("Add friends and optionally their contact info for reminders.")
-                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .font(.system(.body, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.secondaryLabel))
                         }
                         .padding(.horizontal)
@@ -77,7 +77,7 @@ struct AddFriendsView: View {
                                         .fill(Color(.secondarySystemBackground))
                                         .shadow(color: Color.black.opacity(0.06), radius: 6, y: 3)
                                 )
-                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .font(.system(.callout, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.label))
                                 .focused($isKeyboardFocused)
 
@@ -88,13 +88,13 @@ struct AddFriendsView: View {
                                         .fill(Color(.secondarySystemBackground))
                                         .shadow(color: Color.black.opacity(0.06), radius: 6, y: 3)
                                 )
-                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .font(.system(.callout, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.label))
                                 .focused($isKeyboardFocused)
 
                             Button(action: addFriend) {
                                 Text("Add Friend")
-                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                    .font(.system(.headline, design: .rounded))
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(
@@ -125,7 +125,7 @@ struct AddFriendsView: View {
                     path.append("whoPaid")
                 } label: {
                     Text("Continue")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(.headline, design: .rounded))
                         .frame(maxWidth: .infinity, maxHeight: 52)
                         .background(
                             LinearGradient(

@@ -1,0 +1,39 @@
+# ── macOS ─────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── Xcode ─────────────────────────────────────────────────────────
+## User-specific settings (window positions, breakpoints, schemes)
+xcuserdata/
+*.xcuserstate
+
+## Build artifacts
+DerivedData/
+build/
+*.moved-aside
+
+## Index & workspace state
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+# ── Swift Package Manager ─────────────────────────────────────────
+## SPM build output
+.build/
+Package.resolved
+
+## Per-user SPM/Xcode data inside .swiftpm bundles
+**/.swiftpm/xcode/xcuserdata/
+**/.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
+# ── Swift Playgrounds ─────────────────────────────────────────────
+## Playground execution logs (regenerated on run)
+timeline.xctimeline
+playground.xcworkspace
+
+# ── Archives & Submission Zips ────────────────────────────────────
+*.ipa
+*.zip
+
+# ── Claude Code ───────────────────────────────────────────────────
+.claude/

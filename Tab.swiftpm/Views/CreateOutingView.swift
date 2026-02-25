@@ -91,7 +91,7 @@ struct CreateOutingView: View {
                             TextField("Enter location/outing name", text: $draft.locationName)
                                 .focused($isTextFieldFocused)
                                 .submitLabel(.done)
-                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .font(.system(.callout, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.label))
                         }
                         .padding()
@@ -105,7 +105,7 @@ struct CreateOutingView: View {
                         // MARK: Date Picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Outing Date")
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .font(.system(.footnote, design: .rounded, weight: .semibold))
                                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
 
                             DatePicker("", selection: $draft.outingDate, displayedComponents: [.date])
@@ -128,7 +128,7 @@ struct CreateOutingView: View {
                     path.append("addFriends")
                 } label: {
                     Text("Continue")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(.headline, design: .rounded))
                         .frame(maxWidth: .infinity, maxHeight: 52)
                         .background(
                             LinearGradient(

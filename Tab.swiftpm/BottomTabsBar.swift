@@ -24,9 +24,6 @@ struct BottomTabsBar: View {
                 .shadow(color: .black.opacity(0.12), radius: 10, y: 4)
         )
         .padding(.horizontal, 24)
-        .padding(.vertical, 12)
-        // Fills the gap between the pill and the screen bottom (home indicator area)
-        // with the page background so there's no faint box visible in dark mode
         .background(Color(.systemBackground).ignoresSafeArea(edges: .bottom))
     }
 
@@ -39,9 +36,9 @@ struct BottomTabsBar: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
             }
             .foregroundStyle(
                 isActive
@@ -50,6 +47,7 @@ struct BottomTabsBar: View {
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
+            .frame(minHeight: 44)
             .background(
                 Group {
                     if isActive {

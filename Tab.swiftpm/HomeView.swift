@@ -25,6 +25,8 @@ struct HomeView: View {
     @State private var displayMode: HomeDisplayMode = .list
     @State private var expandedMonths: Set<String> = []
 
+    @ScaledMetric(relativeTo: .footnote) private var fabBottomPadding: CGFloat = 80
+
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -56,7 +58,7 @@ struct HomeView: View {
                     // MARK: Header
                     VStack(alignment: .leading, spacing: 6) {
                         Text(selectedSection == .active ? "Your Tabs" : "Settled Tabs")
-                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                            .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                             .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
                         Text(
@@ -64,7 +66,7 @@ struct HomeView: View {
                             ? "Shared moments, settled gently."
                             : "Memories already taken care of."
                         )
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .font(.system(.body, design: .rounded, weight: .medium))
                         .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                     }
                     .padding(.horizontal)
@@ -82,10 +84,9 @@ struct HomeView: View {
                     }
                 }
                 .padding(.top)
-                .padding(.bottom, 90)
             }
             .id(selectedSection)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .safeAreaInset(edge: .bottom, spacing: 8) {
                 BottomTabsBar(selected: $selectedSection)
             }
 
@@ -111,12 +112,12 @@ struct HomeView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 6, y: 3)
 
                         Image(systemName: "plus")
-                            .font(.system(size: 28, weight: .bold))
+                            .font(.system(.title, weight: .bold))
                             .foregroundColor(.white)
                     }
                 }
                 .padding(.trailing, 24)
-                .padding(.bottom, 100)
+                .padding(.bottom, fabBottomPadding)
             }
         }
     }
@@ -139,7 +140,7 @@ private extension HomeView {
                 displayMode = .list
             } label: {
                 Text("List")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
@@ -151,7 +152,7 @@ private extension HomeView {
                 displayMode = .monthly
             } label: {
                 Text("Monthly")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
@@ -186,7 +187,7 @@ private extension HomeView {
                             Image(systemName: "folder.fill")
                                 .foregroundStyle(Color(.label))
                             Text(month)
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .font(.system(.title3, design: .rounded, weight: .semibold))
                                 .foregroundStyle(Color(.label))
                             Spacer()
                             Image(systemName: expandedMonths.contains(month) ? "chevron.down" : "chevron.right")
@@ -233,7 +234,7 @@ private extension HomeView {
                 .foregroundStyle(Color(red: 40/255, green: 90/255, blue: 80/255))
 
             Text("No tabs here")
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .font(.system(.title3, design: .rounded, weight: .semibold))
                 .foregroundStyle(Color(.label))
 
             Text(
@@ -241,7 +242,7 @@ private extension HomeView {
                 ? "Start a tab with friends to see it here."
                 : "Tabs you settle will appear here."
             )
-            .font(.system(size: 17, weight: .medium, design: .rounded))
+            .font(.system(.body, design: .rounded, weight: .medium))
             .foregroundStyle(Color(.secondaryLabel))
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
@@ -253,7 +254,7 @@ private extension HomeView {
                     path.append("create")
                 } label: {
                     Text("Start a Tab")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(.headline, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(
@@ -300,7 +301,7 @@ private extension HomeView {
                     HStack {
                         Image(systemName: "plus.circle.fill")
                         Text("Add Another Tab")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(.headline, design: .rounded))
                     }
                     .frame(maxWidth: .infinity)
                     .padding()

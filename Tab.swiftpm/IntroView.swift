@@ -59,11 +59,11 @@ struct IntroView: View {
 
                 VStack(spacing: 12) {
                     Text("Tab")
-                        .font(.system(size: 38, weight: .heavy, design: .rounded))
+                        .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                         .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
 
                     Text("A gentle way to split bills and keep friendships easy.")
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .font(.system(.body, design: .rounded, weight: .medium))
                         .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
@@ -75,9 +75,9 @@ struct IntroView: View {
                 NavigationLink(value: "home") {
                     HStack {
                         Text("Get Started")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(.headline, design: .rounded))
                         Image(systemName: "arrow.right")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(.headline, design: .rounded))
                     }
                     .frame(maxWidth: .infinity)
                     .padding()

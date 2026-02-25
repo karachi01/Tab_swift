@@ -71,11 +71,11 @@ struct EditTabView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Edit Tab")
-                .font(.system(size: 32, weight: .heavy, design: .rounded))
+                .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                 .foregroundStyle(Color(.label))
 
             Text("Edit the bill details and who paid.")
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(.system(.body, design: .rounded, weight: .medium))
                 .foregroundStyle(Color(.secondaryLabel))
         }
         .padding(.horizontal)
@@ -177,7 +177,7 @@ struct EditTabView: View {
                                   ? "checkmark.circle.fill"
                                   : "circle")
                                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
-                                .font(.system(size: 22))
+                                .font(.system(.title2))
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -259,7 +259,7 @@ struct EditTabView: View {
             saveEdits()
         } label: {
             Text("Save Changes")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .font(.system(.headline, design: .rounded))
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
