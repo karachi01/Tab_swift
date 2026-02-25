@@ -86,7 +86,8 @@ struct TabCardView: View {
                 .resizable()
                 .scaledToFit()
                 .padding(30)
-                .foregroundStyle(.blue.opacity(0.7))
+                .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
+
                 .background(Color(.systemGray6))
 
         } else {
@@ -94,7 +95,7 @@ struct TabCardView: View {
                 .resizable()
                 .scaledToFit()
                 .padding(30)
-                .foregroundStyle(.red.opacity(0.6))
+                .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
                 .background(Color(.systemGray6))
         }
     }

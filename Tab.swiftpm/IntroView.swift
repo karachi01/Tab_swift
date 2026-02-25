@@ -60,11 +60,11 @@ struct IntroView: View {
                 VStack(spacing: 12) {
                     Text("Tab")
                         .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                        .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
+                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255))
 
                     Text("A gentle way to split bills and keep friendships easy.")
                         .font(.system(.body, design: .rounded, weight: .medium))
-                        .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
+                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                         .lineSpacing(4)

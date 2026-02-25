@@ -23,6 +23,7 @@ struct WhoPaidView: View {
     @State private var tipPercentage: String = ""
 
     @FocusState private var focusedField: WhoPaidField?
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
@@ -68,11 +69,11 @@ struct WhoPaidView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Who Paid?")
                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
+                .foregroundStyle(colorScheme == .dark ? Color.white : Color(red: 30/255, green: 60/255, blue: 55/255))
 
             Text("Enter the bill details and select who paid.")
                 .font(.system(.body, design: .rounded, weight: .medium))
-                .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
+                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.7) : Color(red: 90/255, green: 120/255, blue: 110/255))
         }
         .padding(.horizontal)
     }

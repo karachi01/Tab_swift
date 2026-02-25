@@ -15,6 +15,7 @@ struct AddFriendsView: View {
     @State private var newFriendName: String = ""
     @State private var newFriendContact: String = ""
     @FocusState private var isKeyboardFocused: Bool
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
@@ -29,11 +30,11 @@ struct AddFriendsView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Add Friends")
                                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                                .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
+                                .foregroundStyle(colorScheme == .dark ? Color.white : Color(red: 30/255, green: 60/255, blue: 55/255))
 
                             Text("Add friends and optionally their contact info for reminders.")
                                 .font(.system(.body, design: .rounded, weight: .medium))
-                                .foregroundStyle(Color(.secondaryLabel))
+                                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.7) : Color(red: 90/255, green: 120/255, blue: 110/255))
                         }
                         .padding(.horizontal)
 

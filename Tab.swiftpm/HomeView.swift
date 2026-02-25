@@ -4,9 +4,8 @@
 //
 
 import SwiftUI
-import MapKit
 
-enum HomeTabSection {
+enum HomeTabSection: Hashable {
     case active
     case settled
 }
@@ -25,108 +24,100 @@ struct HomeView: View {
     @State private var displayMode: HomeDisplayMode = .list
     @State private var expandedMonths: Set<String> = []
 
-    @ScaledMetric(relativeTo: .footnote) private var fabBottomPadding: CGFloat = 80
-
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-
-            // Light mode: original white + pastel overlay
-            // Dark mode: secondarySystemBackground so cards pop off it
-            if colorScheme == .dark {
-                Color(.secondarySystemBackground)
-                    .ignoresSafeArea()
-            } else {
-                Color.white
-                    .ignoresSafeArea()
-                    .overlay(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 241/255, green: 239/255, blue: 228/255).opacity(0.15),
-                                Color(red: 230/255, green: 238/255, blue: 235/255).opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+        TabView(selection: $selectedSection) {
+            SwiftUI.Tab("Your Tabs", systemImage: "list.bullet", value: .active)
+            {
+                sectionContent(for: .active)
             }
+
+            SwiftUI.Tab(
+                "Settled",
+                systemImage: "checkmark.circle",
+                value: .settled
+            ) {
+                sectionContent(for: .settled)
+            }
+        }
+        .tint(Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255))
+        .tabBarMinimizeBehavior(.onScrollDown)
+    }
+}
+
+// MARK: - Section Content
+
+extension HomeView {
+
+    @ViewBuilder
+    fileprivate func sectionContent(for section: HomeTabSection) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            background
 
             ScrollView {
                 VStack(spacing: 20) {
-
-                    // MARK: Header
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(selectedSection == .active ? "Your Tabs" : "Settled Tabs")
-                            .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                            .foregroundStyle(Color(red: 30/255, green: 60/255, blue: 55/255))
-
-                        Text(
-                            selectedSection == .active
-                            ? "Shared moments, settled gently."
-                            : "Memories already taken care of."
-                        )
-                        .font(.system(.body, design: .rounded, weight: .medium))
-                        .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
-                    }
-                    .padding(.horizontal)
-
+                    sectionHeader(for: section)
                     viewToggle
 
-                    if filteredTabs.isEmpty {
-                        emptyState
+                    let tabs = filteredTabs(for: section)
+                    if tabs.isEmpty {
+                        emptyState(for: section)
                     } else {
                         if displayMode == .list {
-                            tabsTimeline
+                            tabsTimeline(for: section)
                         } else {
-                            monthlyFolders
+                            monthlyFolders(for: section)
                         }
                     }
                 }
                 .padding(.top)
             }
-            .id(selectedSection)
-            .safeAreaInset(edge: .bottom, spacing: 8) {
-                BottomTabsBar(selected: $selectedSection)
-            }
 
-            // FAB
-            if selectedSection == .active {
-                Button {
-                    draft.reset()
-                    path.append("create")
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 70/255, green: 140/255, blue: 125/255),
-                                        Color(red: 110/255, green: 180/255, blue: 160/255)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 56, height: 56)
-                            .shadow(color: Color.black.opacity(0.15), radius: 6, y: 3)
-
-                        Image(systemName: "plus")
-                            .font(.system(.title, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-                }
-                .padding(.trailing, 24)
-                .padding(.bottom, fabBottomPadding)
+            if section == .active {
+                fabButton
+                    .padding(.trailing, 24)
+                    .padding(.bottom, 16)
             }
         }
     }
-}
 
-private extension HomeView {
+    // MARK: - Background
 
-    var filteredTabs: [Binding<Tab>] {
-        switch selectedSection {
+    @ViewBuilder
+    fileprivate var background: some View {
+        if colorScheme == .dark {
+            Color(.secondarySystemBackground)
+                .ignoresSafeArea()
+        } else {
+            Color.white
+                .ignoresSafeArea()
+                .overlay(
+                    LinearGradient(
+                        colors: [
+                            Color(
+                                red: 241 / 255,
+                                green: 239 / 255,
+                                blue: 228 / 255
+                            ).opacity(0.15),
+                            Color(
+                                red: 230 / 255,
+                                green: 238 / 255,
+                                blue: 235 / 255
+                            ).opacity(0.1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        }
+    }
+
+    // MARK: - Data
+
+    fileprivate func filteredTabs(for section: HomeTabSection) -> [Binding<Tab>]
+    {
+        switch section {
         case .active:
             return $tabManager.tabs.filter { !$0.wrappedValue.isSettled }
         case .settled:
@@ -134,17 +125,53 @@ private extension HomeView {
         }
     }
 
-    var viewToggle: some View {
+    // MARK: - Header
+
+    fileprivate func sectionHeader(for section: HomeTabSection) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(section == .active ? "Your Tabs" : "Settled Tabs")
+                .font(.system(.largeTitle, design: .rounded, weight: .heavy))
+                .foregroundStyle(
+                    colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                )
+
+            Text(
+                section == .active
+                    ? "Shared moments, settled gently."
+                    : "Memories already taken care of."
+            )
+            .font(.system(.body, design: .rounded, weight: .medium))
+            .foregroundStyle(
+                colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+            )
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - View Toggle
+
+    fileprivate var viewToggle: some View {
         HStack {
             Button {
                 displayMode = .list
             } label: {
                 Text("List")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
+                    .font(
+                        .system(
+                            .subheadline,
+                            design: .rounded,
+                            weight: .semibold
+                        )
+                    )
+                    .foregroundStyle(
+                        colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                    )
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
-                    .background(displayMode == .list ? Color.green.opacity(0.2) : Color.clear)
+                    .background(
+                        displayMode == .list
+                            ? Color.green.opacity(0.2) : Color.clear
+                    )
                     .cornerRadius(20)
             }
 
@@ -152,11 +179,22 @@ private extension HomeView {
                 displayMode = .monthly
             } label: {
                 Text("Monthly")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(Color(red: 90/255, green: 120/255, blue: 110/255))
+                    .font(
+                        .system(
+                            .subheadline,
+                            design: .rounded,
+                            weight: .semibold
+                        )
+                    )
+                    .foregroundStyle(
+                        colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                    )
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
-                    .background(displayMode == .monthly ? Color.green.opacity(0.2) : Color.clear)
+                    .background(
+                        displayMode == .monthly
+                            ? Color.green.opacity(0.2) : Color.clear
+                    )
                     .cornerRadius(20)
             }
 
@@ -165,11 +203,16 @@ private extension HomeView {
         .padding(.horizontal)
     }
 
-    var monthlyFolders: some View {
-        let grouped = Dictionary(grouping: filteredTabs) {
+    // MARK: - Monthly Folders
+
+    fileprivate func monthlyFolders(for section: HomeTabSection) -> some View {
+        let tabs = filteredTabs(for: section)
+        let grouped = Dictionary(grouping: tabs) {
             monthString(from: $0.wrappedValue.date)
         }
-        let sortedKeys = grouped.keys.sorted { monthDate(from: $0) > monthDate(from: $1) }
+        let sortedKeys = grouped.keys.sorted {
+            monthDate(from: $0) > monthDate(from: $1)
+        }
 
         return LazyVStack(spacing: 14) {
             ForEach(sortedKeys, id: \.self) { month in
@@ -187,11 +230,20 @@ private extension HomeView {
                             Image(systemName: "folder.fill")
                                 .foregroundStyle(Color(.label))
                             Text(month)
-                                .font(.system(.title3, design: .rounded, weight: .semibold))
+                                .font(
+                                    .system(
+                                        .title3,
+                                        design: .rounded,
+                                        weight: .semibold
+                                    )
+                                )
                                 .foregroundStyle(Color(.label))
                             Spacer()
-                            Image(systemName: expandedMonths.contains(month) ? "chevron.down" : "chevron.right")
-                                .foregroundStyle(Color(.secondaryLabel))
+                            Image(
+                                systemName: expandedMonths.contains(month)
+                                    ? "chevron.down" : "chevron.right"
+                            )
+                            .foregroundStyle(Color(.secondaryLabel))
                         }
                         .padding()
                         .background(
@@ -219,28 +271,36 @@ private extension HomeView {
         }
     }
 
-    func monthString(from date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "MMMM yyyy"; return f.string(from: date)
+    fileprivate func monthString(from date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "MMMM yyyy"
+        return f.string(from: date)
     }
 
-    func monthDate(from string: String) -> Date {
-        let f = DateFormatter(); f.dateFormat = "MMMM yyyy"; return f.date(from: string) ?? Date()
+    fileprivate func monthDate(from string: String) -> Date {
+        let f = DateFormatter()
+        f.dateFormat = "MMMM yyyy"
+        return f.date(from: string) ?? Date()
     }
 
-    var emptyState: some View {
+    // MARK: - Empty State
+
+    fileprivate func emptyState(for section: HomeTabSection) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "fork.knife.circle.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(Color(red: 40/255, green: 90/255, blue: 80/255))
+                .foregroundStyle(
+                    Color(red: 40 / 255, green: 90 / 255, blue: 80 / 255)
+                )
 
             Text("No tabs here")
                 .font(.system(.title3, design: .rounded, weight: .semibold))
                 .foregroundStyle(Color(.label))
 
             Text(
-                selectedSection == .active
-                ? "Start a tab with friends to see it here."
-                : "Tabs you settle will appear here."
+                section == .active
+                    ? "Start a tab with friends to see it here."
+                    : "Tabs you settle will appear here."
             )
             .font(.system(.body, design: .rounded, weight: .medium))
             .foregroundStyle(Color(.secondaryLabel))
@@ -248,7 +308,7 @@ private extension HomeView {
             .padding(.horizontal, 32)
             .lineSpacing(4)
 
-            if selectedSection == .active {
+            if section == .active {
                 Button {
                     draft.reset()
                     path.append("create")
@@ -260,8 +320,16 @@ private extension HomeView {
                         .background(
                             LinearGradient(
                                 colors: [
-                                    Color(red: 70/255, green: 140/255, blue: 125/255),
-                                    Color(red: 110/255, green: 180/255, blue: 160/255)
+                                    Color(
+                                        red: 70 / 255,
+                                        green: 140 / 255,
+                                        blue: 125 / 255
+                                    ),
+                                    Color(
+                                        red: 110 / 255,
+                                        green: 180 / 255,
+                                        blue: 160 / 255
+                                    ),
                                 ],
                                 startPoint: .leading,
                                 endPoint: .trailing
@@ -269,7 +337,11 @@ private extension HomeView {
                         )
                         .foregroundStyle(.white)
                         .cornerRadius(14)
-                        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
+                        .shadow(
+                            color: Color.black.opacity(0.15),
+                            radius: 8,
+                            y: 4
+                        )
                 }
             }
         }
@@ -283,9 +355,12 @@ private extension HomeView {
         .padding(.horizontal)
     }
 
-    var tabsTimeline: some View {
-        LazyVStack(spacing: 16) {
-            ForEach(filteredTabs) { $tab in
+    // MARK: - Tabs Timeline
+
+    fileprivate func tabsTimeline(for section: HomeTabSection) -> some View {
+        let tabs = filteredTabs(for: section)
+        return LazyVStack(spacing: 16) {
+            ForEach(tabs) { $tab in
                 NavigationLink(value: tab.id) {
                     TabCardView(tab: $tab)
                 }
@@ -293,7 +368,7 @@ private extension HomeView {
                 .padding(.horizontal)
             }
 
-            if selectedSection == .active {
+            if section == .active {
                 Button {
                     draft.reset()
                     path.append("create")
@@ -308,8 +383,16 @@ private extension HomeView {
                     .background(
                         LinearGradient(
                             colors: [
-                                Color(red: 70/255, green: 140/255, blue: 125/255),
-                                Color(red: 110/255, green: 180/255, blue: 160/255)
+                                Color(
+                                    red: 70 / 255,
+                                    green: 140 / 255,
+                                    blue: 125 / 255
+                                ),
+                                Color(
+                                    red: 110 / 255,
+                                    green: 180 / 255,
+                                    blue: 160 / 255
+                                ),
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
@@ -320,6 +403,43 @@ private extension HomeView {
                     .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                 }
                 .padding(.horizontal)
+            }
+        }
+    }
+
+    // MARK: - FAB
+
+    fileprivate var fabButton: some View {
+        Button {
+            draft.reset()
+            path.append("create")
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(
+                                    red: 70 / 255,
+                                    green: 140 / 255,
+                                    blue: 125 / 255
+                                ),
+                                Color(
+                                    red: 110 / 255,
+                                    green: 180 / 255,
+                                    blue: 160 / 255
+                                ),
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 56, height: 56)
+                    .shadow(color: Color.black.opacity(0.15), radius: 6, y: 3)
+
+                Image(systemName: "plus")
+                    .font(.system(.title, weight: .bold))
+                    .foregroundColor(.white)
             }
         }
     }
