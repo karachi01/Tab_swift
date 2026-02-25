@@ -60,11 +60,11 @@ struct IntroView: View {
                 VStack(spacing: 12) {
                     Text("Tab")
                         .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255))
+                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30/255, green: 60/255, blue: 55/255))
 
                     Text("A gentle way to split bills and keep friendships easy.")
                         .font(.system(.body, design: .rounded, weight: .medium))
-                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255))
+                        .foregroundStyle(colorScheme == .dark ? Color(.label) : Color(red: 30/255, green: 60/255, blue: 55/255))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                         .lineSpacing(4)
@@ -72,7 +72,12 @@ struct IntroView: View {
 
                 Spacer()
 
-                NavigationLink(value: "home") {
+                // Use a plain Button + path.append instead of NavigationLink
+                // to avoid the default NavigationLink background that causes
+                // the black box at small Dynamic Type sizes
+                Button {
+                    path.append("home")
+                } label: {
                     HStack {
                         Text("Get Started")
                             .font(.system(.headline, design: .rounded))
@@ -95,6 +100,7 @@ struct IntroView: View {
                     .cornerRadius(18)
                     .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal)
                 .padding(.bottom, 32)
             }
