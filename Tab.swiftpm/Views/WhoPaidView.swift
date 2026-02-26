@@ -41,6 +41,9 @@ struct WhoPaidView: View {
                 }
                 .padding(.bottom, 30)
             }
+            // Prevents the floating mini keyboard on iPad by telling the
+            // scroll view to work with the docked keyboard instead
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Bill Split")
         .navigationBarTitleDisplayMode(.inline)
@@ -81,7 +84,6 @@ struct WhoPaidView: View {
     // MARK: Bill Inputs
     private var billInputSection: some View {
         VStack(spacing: 16) {
-            // Total Bill
             VStack(alignment: .leading, spacing: 6) {
                 Text("Total Bill")
                     .font(.caption)
@@ -102,7 +104,6 @@ struct WhoPaidView: View {
                 )
             }
 
-            // Tax
             VStack(alignment: .leading, spacing: 6) {
                 Text("Tax (optional)")
                     .font(.caption)
@@ -123,7 +124,6 @@ struct WhoPaidView: View {
                 )
             }
 
-            // Tip
             VStack(alignment: .leading, spacing: 6) {
                 Text("Tip")
                     .font(.caption)
@@ -294,6 +294,7 @@ struct WhoPaidView: View {
         let splitAmount = total / Double(friends.count)
         for i in friends.indices {
             friends[i].owesAmount = friends[i].id == payerID ? 0 : splitAmount
+            friends[i].paidAmount = friends[i].id == payerID ? total : 0
         }
     }
 

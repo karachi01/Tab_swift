@@ -14,6 +14,9 @@ struct CustomSplitView: View {
 
     @State private var sharedTax: String = ""
 
+    @State private var amountStrings: [UUID: String] = [:]
+    @State private var tipStrings: [UUID: String] = [:]
+
     @FocusState private var isKeyboardFocused: Bool
 
     private var taxPerPerson: Double {
@@ -22,8 +25,16 @@ struct CustomSplitView: View {
         return tax / Double(friends.count)
     }
 
+    private func paidAmount(for friend: Friend) -> Double {
+        Double(amountStrings[friend.id] ?? "") ?? 0
+    }
+
+    private func tipAmount(for friend: Friend) -> Double {
+        Double(tipStrings[friend.id] ?? "") ?? 0
+    }
+
     private func subtotal(for friend: Friend) -> Double {
-        friend.paidAmount + friend.customTip + taxPerPerson
+        paidAmount(for: friend) + tipAmount(for: friend) + taxPerPerson
     }
 
     private var customTotal: Double {
@@ -58,7 +69,7 @@ struct CustomSplitView: View {
                             .padding(.horizontal)
 
                         VStack(spacing: 12) {
-                            ForEach($friends) { $friend in
+                            ForEach(friends) { friend in
                                 VStack(alignment: .leading, spacing: 10) {
 
                                     Text(friend.isYou ? "You" : friend.name)
@@ -71,15 +82,18 @@ struct CustomSplitView: View {
                                         Spacer()
                                         Text("$")
                                             .foregroundStyle(Color(.secondaryLabel))
-                                        TextField("0.00", value: $friend.paidAmount, format: .number)
-                                            .keyboardType(.decimalPad)
-                                            .multilineTextAlignment(.trailing)
-                                            .foregroundStyle(Color(.label))
-                                            .frame(width: 100)
-                                            .padding(8)
-                                            .background(Color(.tertiarySystemBackground))
-                                            .cornerRadius(10)
-                                            .focused($isKeyboardFocused)
+                                        TextField("0.00", text: Binding(
+                                            get: { amountStrings[friend.id] ?? "" },
+                                            set: { amountStrings[friend.id] = $0 }
+                                        ))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .foregroundStyle(Color(.label))
+                                        .frame(width: 100)
+                                        .padding(8)
+                                        .background(Color(.tertiarySystemBackground))
+                                        .cornerRadius(10)
+                                        .focused($isKeyboardFocused)
                                     }
 
                                     HStack {
@@ -88,15 +102,18 @@ struct CustomSplitView: View {
                                         Spacer()
                                         Text("$")
                                             .foregroundStyle(Color(.secondaryLabel))
-                                        TextField("0.00", value: $friend.customTip, format: .number)
-                                            .keyboardType(.decimalPad)
-                                            .multilineTextAlignment(.trailing)
-                                            .foregroundStyle(Color(.label))
-                                            .frame(width: 100)
-                                            .padding(8)
-                                            .background(Color(.tertiarySystemBackground))
-                                            .cornerRadius(10)
-                                            .focused($isKeyboardFocused)
+                                        TextField("0.00", text: Binding(
+                                            get: { tipStrings[friend.id] ?? "" },
+                                            set: { tipStrings[friend.id] = $0 }
+                                        ))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .foregroundStyle(Color(.label))
+                                        .frame(width: 100)
+                                        .padding(8)
+                                        .background(Color(.tertiarySystemBackground))
+                                        .cornerRadius(10)
+                                        .focused($isKeyboardFocused)
                                     }
 
                                     HStack {
@@ -104,7 +121,7 @@ struct CustomSplitView: View {
                                             .font(.caption)
                                             .foregroundStyle(Color(.secondaryLabel))
                                         Spacer()
-                                        Text("$\(String(format: "%.2f", friend.paidAmount + friend.customTip))")
+                                        Text("$\(String(format: "%.2f", paidAmount(for: friend) + tipAmount(for: friend)))")
                                             .font(.caption)
                                             .foregroundStyle(Color(.secondaryLabel))
                                     }
@@ -198,6 +215,8 @@ struct CustomSplitView: View {
                     Button {
                         isKeyboardFocused = false
                         for i in friends.indices {
+                            friends[i].paidAmount = paidAmount(for: friends[i])
+                            friends[i].customTip = tipAmount(for: friends[i])
                             friends[i].owesAmount = subtotal(for: friends[i])
                         }
                         onConfirm(customTotal)
@@ -225,6 +244,9 @@ struct CustomSplitView: View {
                 }
                 .padding(.top)
             }
+            // Prevents the floating mini keyboard on iPad — forces the
+            // full docked keyboard instead of the compact floating one
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Custom Split")
         .navigationBarTitleDisplayMode(.inline)
@@ -233,6 +255,20 @@ struct CustomSplitView: View {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
                 Button("Done") { isKeyboardFocused = false }
+            }
+        }
+        .onAppear {
+            for friend in friends {
+                if friend.paidAmount > 0 {
+                    let v = friend.paidAmount
+                    amountStrings[friend.id] = v.truncatingRemainder(dividingBy: 1) == 0
+                        ? String(Int(v)) : String(v)
+                }
+                if friend.customTip > 0 {
+                    let v = friend.customTip
+                    tipStrings[friend.id] = v.truncatingRemainder(dividingBy: 1) == 0
+                        ? String(Int(v)) : String(v)
+                }
             }
         }
     }

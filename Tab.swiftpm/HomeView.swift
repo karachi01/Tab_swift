@@ -27,22 +27,25 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        TabView(selection: $selectedSection) {
-            SwiftUI.Tab("Your Tabs", systemImage: "list.bullet", value: .active)
-            {
-                sectionContent(for: .active)
-            }
+        ZStack {
+            // Background applied at the outermost ZStack level so it
+            // fills the entire screen on iPad in both portrait and landscape,
+            // including areas outside the TabView safe area
+            background
+                .ignoresSafeArea()
 
-            SwiftUI.Tab(
-                "Settled",
-                systemImage: "checkmark.circle",
-                value: .settled
-            ) {
-                sectionContent(for: .settled)
+            TabView(selection: $selectedSection) {
+                SwiftUI.Tab("Your Tabs", systemImage: "list.bullet", value: .active) {
+                    sectionContent(for: .active)
+                }
+
+                SwiftUI.Tab("Settled", systemImage: "checkmark.circle", value: .settled) {
+                    sectionContent(for: .settled)
+                }
             }
+            .tint(Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255))
+            .tabBarMinimizeBehavior(.onScrollDown)
         }
-        .tint(Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255))
-        .tabBarMinimizeBehavior(.onScrollDown)
     }
 }
 
@@ -53,7 +56,9 @@ extension HomeView {
     @ViewBuilder
     fileprivate func sectionContent(for section: HomeTabSection) -> some View {
         ZStack(alignment: .bottomTrailing) {
+            // Also fill behind the scroll content within each tab
             background
+                .ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 20) {
@@ -88,23 +93,13 @@ extension HomeView {
     fileprivate var background: some View {
         if colorScheme == .dark {
             Color(.secondarySystemBackground)
-                .ignoresSafeArea()
         } else {
             Color.white
-                .ignoresSafeArea()
                 .overlay(
                     LinearGradient(
                         colors: [
-                            Color(
-                                red: 241 / 255,
-                                green: 239 / 255,
-                                blue: 228 / 255
-                            ).opacity(0.15),
-                            Color(
-                                red: 230 / 255,
-                                green: 238 / 255,
-                                blue: 235 / 255
-                            ).opacity(0.1),
+                            Color(red: 241 / 255, green: 239 / 255, blue: 228 / 255).opacity(0.15),
+                            Color(red: 230 / 255, green: 238 / 255, blue: 235 / 255).opacity(0.1),
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -115,8 +110,7 @@ extension HomeView {
 
     // MARK: - Data
 
-    fileprivate func filteredTabs(for section: HomeTabSection) -> [Binding<Tab>]
-    {
+    fileprivate func filteredTabs(for section: HomeTabSection) -> [Binding<Tab>] {
         switch section {
         case .active:
             return $tabManager.tabs.filter { !$0.wrappedValue.isSettled }
@@ -132,7 +126,9 @@ extension HomeView {
             Text(section == .active ? "Your Tabs" : "Settled Tabs")
                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                 .foregroundStyle(
-                    colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                    colorScheme == .dark
+                        ? Color(.label)
+                        : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
                 )
 
             Text(
@@ -142,7 +138,9 @@ extension HomeView {
             )
             .font(.system(.body, design: .rounded, weight: .medium))
             .foregroundStyle(
-                colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                colorScheme == .dark
+                    ? Color(.label)
+                    : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
             )
         }
         .padding(.horizontal)
@@ -156,22 +154,15 @@ extension HomeView {
                 displayMode = .list
             } label: {
                 Text("List")
-                    .font(
-                        .system(
-                            .subheadline,
-                            design: .rounded,
-                            weight: .semibold
-                        )
-                    )
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .foregroundStyle(
-                        colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                        colorScheme == .dark
+                            ? Color(.label)
+                            : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
                     )
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
-                    .background(
-                        displayMode == .list
-                            ? Color.green.opacity(0.2) : Color.clear
-                    )
+                    .background(displayMode == .list ? Color.green.opacity(0.2) : Color.clear)
                     .cornerRadius(20)
             }
 
@@ -179,22 +170,15 @@ extension HomeView {
                 displayMode = .monthly
             } label: {
                 Text("Monthly")
-                    .font(
-                        .system(
-                            .subheadline,
-                            design: .rounded,
-                            weight: .semibold
-                        )
-                    )
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .foregroundStyle(
-                        colorScheme == .dark ? Color(.label) : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                        colorScheme == .dark
+                            ? Color(.label)
+                            : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
                     )
                     .padding(.vertical, 6)
                     .padding(.horizontal, 16)
-                    .background(
-                        displayMode == .monthly
-                            ? Color.green.opacity(0.2) : Color.clear
-                    )
+                    .background(displayMode == .monthly ? Color.green.opacity(0.2) : Color.clear)
                     .cornerRadius(20)
             }
 
@@ -230,20 +214,11 @@ extension HomeView {
                             Image(systemName: "folder.fill")
                                 .foregroundStyle(Color(.label))
                             Text(month)
-                                .font(
-                                    .system(
-                                        .title3,
-                                        design: .rounded,
-                                        weight: .semibold
-                                    )
-                                )
+                                .font(.system(.title3, design: .rounded, weight: .semibold))
                                 .foregroundStyle(Color(.label))
                             Spacer()
-                            Image(
-                                systemName: expandedMonths.contains(month)
-                                    ? "chevron.down" : "chevron.right"
-                            )
-                            .foregroundStyle(Color(.secondaryLabel))
+                            Image(systemName: expandedMonths.contains(month) ? "chevron.down" : "chevron.right")
+                                .foregroundStyle(Color(.secondaryLabel))
                         }
                         .padding()
                         .background(
@@ -289,9 +264,7 @@ extension HomeView {
         VStack(spacing: 16) {
             Image(systemName: "fork.knife.circle.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(
-                    Color(red: 40 / 255, green: 90 / 255, blue: 80 / 255)
-                )
+                .foregroundStyle(Color(red: 40 / 255, green: 90 / 255, blue: 80 / 255))
 
             Text("No tabs here")
                 .font(.system(.title3, design: .rounded, weight: .semibold))
@@ -320,16 +293,8 @@ extension HomeView {
                         .background(
                             LinearGradient(
                                 colors: [
-                                    Color(
-                                        red: 70 / 255,
-                                        green: 140 / 255,
-                                        blue: 125 / 255
-                                    ),
-                                    Color(
-                                        red: 110 / 255,
-                                        green: 180 / 255,
-                                        blue: 160 / 255
-                                    ),
+                                    Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255),
+                                    Color(red: 110 / 255, green: 180 / 255, blue: 160 / 255),
                                 ],
                                 startPoint: .leading,
                                 endPoint: .trailing
@@ -337,11 +302,7 @@ extension HomeView {
                         )
                         .foregroundStyle(.white)
                         .cornerRadius(14)
-                        .shadow(
-                            color: Color.black.opacity(0.15),
-                            radius: 8,
-                            y: 4
-                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                 }
             }
         }
@@ -383,16 +344,8 @@ extension HomeView {
                     .background(
                         LinearGradient(
                             colors: [
-                                Color(
-                                    red: 70 / 255,
-                                    green: 140 / 255,
-                                    blue: 125 / 255
-                                ),
-                                Color(
-                                    red: 110 / 255,
-                                    green: 180 / 255,
-                                    blue: 160 / 255
-                                ),
+                                Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255),
+                                Color(red: 110 / 255, green: 180 / 255, blue: 160 / 255),
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
@@ -419,16 +372,8 @@ extension HomeView {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color(
-                                    red: 70 / 255,
-                                    green: 140 / 255,
-                                    blue: 125 / 255
-                                ),
-                                Color(
-                                    red: 110 / 255,
-                                    green: 180 / 255,
-                                    blue: 160 / 255
-                                ),
+                                Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255),
+                                Color(red: 110 / 255, green: 180 / 255, blue: 160 / 255),
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing

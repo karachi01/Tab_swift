@@ -18,6 +18,11 @@ struct TabDetailView: View {
     @State private var showSettledCheck = false
     @State private var showDeleteConfirmation = false
 
+    // Taller hero on iPad to match the visual weight of the iPhone view
+    private var heroHeight: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .pad ? 380 : 240
+    }
+
     private var tab: Tab? {
         tabManager.tabs.first { $0.id == tabID }
     }
@@ -35,7 +40,7 @@ struct TabDetailView: View {
                         ZStack(alignment: .bottomLeading) {
                             heroVisual(tab: tab)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 240)
+                                .frame(height: heroHeight)
                                 .clipped()
 
                             LinearGradient(

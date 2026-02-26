@@ -206,7 +206,7 @@ struct EditTabView: View {
                 focusedField = nil
                 splitBill()
             }
-            GradientButton(title: "Custom Split", icon: "chevron.right") {
+            GradientButton(title: "Custom Split/Tip", icon: "chevron.right") {
                 focusedField = nil
                 showCustomSplit = true
             }
