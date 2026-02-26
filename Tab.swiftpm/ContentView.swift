@@ -23,7 +23,7 @@ struct ContentView: View {
                         switch route {
                         case "home":
                             HomeView(path: $path)
-                                .adaptiveContainer()
+                                .adaptiveContainer { HomeBackground() }
 
                         case "create":
                             CreateOutingView(path: $path)

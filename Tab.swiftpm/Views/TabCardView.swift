@@ -10,6 +10,7 @@ import UIKit
 
 struct TabCardView: View {
     @Binding var tab: Tab
+    @Environment(\.colorScheme) var colorScheme
 
     private let cornerRadius: CGFloat = 20
 
@@ -41,6 +42,15 @@ struct TabCardView: View {
                 .padding()
             }
 
+            // Divider line separating the visual header from the details.
+            // In dark mode this creates a crisp edge between the two sections;
+            // in light mode it's barely visible since the card is already white.
+            Rectangle()
+                .fill(colorScheme == .dark
+                      ? Color(red: 70/255, green: 140/255, blue: 125/255).opacity(0.35)
+                      : Color(.separator).opacity(0.2))
+                .frame(height: 1)
+
             // MARK: Details
             VStack(alignment: .leading, spacing: 8) {
                 Text("Total Amount")
@@ -64,10 +74,19 @@ struct TabCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .background(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                // systemBackground = white in light mode (unchanged),
-                // elevated dark surface in dark mode — pops off secondarySystemBackground
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+        )
+        // In dark mode add a subtle teal-tinted border so the card has
+        // definition against the secondarySystemBackground page
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .stroke(
+                    colorScheme == .dark
+                        ? Color(red: 70/255, green: 140/255, blue: 125/255).opacity(0.25)
+                        : Color.clear,
+                    lineWidth: 1
+                )
         )
         .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
@@ -87,8 +106,12 @@ struct TabCardView: View {
                 .scaledToFit()
                 .padding(30)
                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
-
-                .background(Color(.systemGray6))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Slightly different background in dark vs light so the icon
+                // area reads as visually separate from the details below
+                .background(colorScheme == .dark
+                            ? Color(.systemGray5)
+                            : Color(.systemGray6))
 
         } else {
             Image(systemName: "mappin.circle.fill")
@@ -96,7 +119,10 @@ struct TabCardView: View {
                 .scaledToFit()
                 .padding(30)
                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
-                .background(Color(.systemGray6))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(colorScheme == .dark
+                            ? Color(.systemGray5)
+                            : Color(.systemGray6))
         }
     }
 }

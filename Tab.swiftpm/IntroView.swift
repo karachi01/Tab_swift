@@ -14,8 +14,6 @@ struct IntroView: View {
 
     var body: some View {
         ZStack {
-            // Light mode: original pastel gradient exactly as before
-            // Dark mode: system dark background with same subtle tint
             if colorScheme == .dark {
                 Color(.systemBackground)
                     .ignoresSafeArea()
@@ -45,16 +43,23 @@ struct IntroView: View {
             VStack(spacing: 32) {
                 Spacer()
 
-                // Icon bubble
+                // App icon displayed inside a circle bubble.
+                // Replace "TabIcon" with the exact name of your image asset.
                 ZStack {
                     Circle()
                         .fill(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white.opacity(0.7))
                         .frame(width: 120, height: 120)
                         .shadow(color: Color.black.opacity(0.05), radius: 6, y: 3)
 
-                    Image(systemName: "fork.knife.circle.fill")
-                        .font(.system(size: 56))
-                        .foregroundStyle(Color(red: 70/255, green: 110/255, blue: 105/255))
+                    Image("TabIcon")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color(red: 70/255, green: 110/255, blue: 105/255), lineWidth: 3)
+                        )
                 }
 
                 VStack(spacing: 12) {
@@ -72,9 +77,6 @@ struct IntroView: View {
 
                 Spacer()
 
-                // Use a plain Button + path.append instead of NavigationLink
-                // to avoid the default NavigationLink background that causes
-                // the black box at small Dynamic Type sizes
                 Button {
                     path.append("home")
                 } label: {

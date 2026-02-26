@@ -15,6 +15,28 @@ enum HomeDisplayMode {
     case monthly
 }
 
+struct HomeBackground: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        if colorScheme == .dark {
+            Color(.secondarySystemBackground)
+        } else {
+            Color.white
+                .overlay(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 241 / 255, green: 239 / 255, blue: 228 / 255).opacity(0.15),
+                            Color(red: 230 / 255, green: 238 / 255, blue: 235 / 255).opacity(0.1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        }
+    }
+}
+
 struct HomeView: View {
     @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var draft: OutingDraft
@@ -27,25 +49,17 @@ struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ZStack {
-            // Background applied at the outermost ZStack level so it
-            // fills the entire screen on iPad in both portrait and landscape,
-            // including areas outside the TabView safe area
-            background
-                .ignoresSafeArea()
-
-            TabView(selection: $selectedSection) {
-                SwiftUI.Tab("Your Tabs", systemImage: "list.bullet", value: .active) {
-                    sectionContent(for: .active)
-                }
-
-                SwiftUI.Tab("Settled", systemImage: "checkmark.circle", value: .settled) {
-                    sectionContent(for: .settled)
-                }
+        TabView(selection: $selectedSection) {
+            SwiftUI.Tab("Your Tabs", systemImage: "list.bullet", value: .active) {
+                sectionContent(for: .active)
             }
-            .tint(Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255))
-            .tabBarMinimizeBehavior(.onScrollDown)
+
+            SwiftUI.Tab("Settled", systemImage: "checkmark.circle", value: .settled) {
+                sectionContent(for: .settled)
+            }
         }
+        .tint(Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255))
+        .tabBarMinimizeBehavior(.onScrollDown)
     }
 }
 
@@ -56,8 +70,9 @@ extension HomeView {
     @ViewBuilder
     fileprivate func sectionContent(for section: HomeTabSection) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            // Also fill behind the scroll content within each tab
-            background
+            // Paint the page background explicitly so iPad TabView container
+            // defaults don't introduce a darker center region.
+            HomeBackground()
                 .ignoresSafeArea()
 
             ScrollView {
@@ -85,27 +100,7 @@ extension HomeView {
                     .padding(.bottom, 16)
             }
         }
-    }
-
-    // MARK: - Background
-
-    @ViewBuilder
-    fileprivate var background: some View {
-        if colorScheme == .dark {
-            Color(.secondarySystemBackground)
-        } else {
-            Color.white
-                .overlay(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 241 / 255, green: 239 / 255, blue: 228 / 255).opacity(0.15),
-                            Color(red: 230 / 255, green: 238 / 255, blue: 235 / 255).opacity(0.1),
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     // MARK: - Data
