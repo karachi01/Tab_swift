@@ -13,6 +13,7 @@ enum HomeTabSection: Hashable {
 enum HomeDisplayMode {
     case list
     case monthly
+    case yearly
 }
 
 struct HomeBackground: View {
@@ -45,6 +46,7 @@ struct HomeView: View {
     @State private var selectedSection: HomeTabSection = .active
     @State private var displayMode: HomeDisplayMode = .list
     @State private var expandedMonths: Set<String> = []
+    @State private var expandedYears: Set<String> = []
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -70,8 +72,6 @@ extension HomeView {
     @ViewBuilder
     fileprivate func sectionContent(for section: HomeTabSection) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            // Paint the page background explicitly so iPad TabView container
-            // defaults don't introduce a darker center region.
             HomeBackground()
                 .ignoresSafeArea()
 
@@ -86,8 +86,10 @@ extension HomeView {
                     } else {
                         if displayMode == .list {
                             tabsTimeline(for: section)
-                        } else {
+                        } else if displayMode == .monthly {
                             monthlyFolders(for: section)
+                        } else {
+                            yearlyFolders(for: section)
                         }
                     }
                 }
@@ -145,38 +147,25 @@ extension HomeView {
 
     fileprivate var viewToggle: some View {
         HStack {
-            Button {
-                displayMode = .list
-            } label: {
-                Text("List")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(
-                        colorScheme == .dark
-                            ? Color(.label)
-                            : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
-                    )
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 16)
-                    .background(displayMode == .list ? Color.green.opacity(0.2) : Color.clear)
-                    .cornerRadius(20)
+            ForEach([("List", HomeDisplayMode.list),
+                     ("Monthly", HomeDisplayMode.monthly),
+                     ("Yearly", HomeDisplayMode.yearly)], id: \.0) { label, mode in
+                Button {
+                    displayMode = mode
+                } label: {
+                    Text(label)
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(
+                            colorScheme == .dark
+                                ? Color(.label)
+                                : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
+                        )
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 16)
+                        .background(displayMode == mode ? Color.green.opacity(0.2) : Color.clear)
+                        .cornerRadius(20)
+                }
             }
-
-            Button {
-                displayMode = .monthly
-            } label: {
-                Text("Monthly")
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(
-                        colorScheme == .dark
-                            ? Color(.label)
-                            : Color(red: 30 / 255, green: 60 / 255, blue: 55 / 255)
-                    )
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 16)
-                    .background(displayMode == .monthly ? Color.green.opacity(0.2) : Color.clear)
-                    .cornerRadius(20)
-            }
-
             Spacer()
         }
         .padding(.horizontal)
@@ -212,6 +201,9 @@ extension HomeView {
                                 .font(.system(.title3, design: .rounded, weight: .semibold))
                                 .foregroundStyle(Color(.label))
                             Spacer()
+                            Text("\(tabsForMonth.count) tab\(tabsForMonth.count == 1 ? "" : "s")")
+                                .font(.system(.caption, design: .rounded, weight: .medium))
+                                .foregroundStyle(Color(.secondaryLabel))
                             Image(systemName: expandedMonths.contains(month) ? "chevron.down" : "chevron.right")
                                 .foregroundStyle(Color(.secondaryLabel))
                         }
@@ -241,6 +233,122 @@ extension HomeView {
         }
     }
 
+    // MARK: - Yearly Folders
+
+    fileprivate func yearlyFolders(for section: HomeTabSection) -> some View {
+        let tabs = filteredTabs(for: section)
+        let grouped = Dictionary(grouping: tabs) {
+            yearString(from: $0.wrappedValue.date)
+        }
+        let sortedKeys = grouped.keys.sorted { $0 > $1 }
+
+        return LazyVStack(spacing: 14) {
+            ForEach(sortedKeys, id: \.self) { year in
+                let tabsForYear = grouped[year] ?? []
+
+                VStack(alignment: .leading, spacing: 8) {
+                    // Year folder header
+                    Button {
+                        if expandedYears.contains(year) {
+                            expandedYears.remove(year)
+                        } else {
+                            expandedYears.insert(year)
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
+                            Text(year)
+                                .font(.system(.title3, design: .rounded, weight: .semibold))
+                                .foregroundStyle(Color(.label))
+                            Spacer()
+                            Text("\(tabsForYear.count) tab\(tabsForYear.count == 1 ? "" : "s")")
+                                .font(.system(.caption, design: .rounded, weight: .medium))
+                                .foregroundStyle(Color(.secondaryLabel))
+                            Image(systemName: expandedYears.contains(year) ? "chevron.down" : "chevron.right")
+                                .foregroundStyle(Color(.secondaryLabel))
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.06), radius: 6)
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    // When expanded, show month sub-folders within the year
+                    if expandedYears.contains(year) {
+                        let monthGrouped = Dictionary(grouping: tabsForYear) {
+                            monthString(from: $0.wrappedValue.date)
+                        }
+                        let sortedMonths = monthGrouped.keys.sorted {
+                            monthDate(from: $0) > monthDate(from: $1)
+                        }
+
+                        LazyVStack(spacing: 10) {
+                            ForEach(sortedMonths, id: \.self) { month in
+                                let tabsForMonth = monthGrouped[month] ?? []
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    // Month sub-folder header
+                                    Button {
+                                        if expandedMonths.contains(month) {
+                                            expandedMonths.remove(month)
+                                        } else {
+                                            expandedMonths.insert(month)
+                                        }
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "folder.fill")
+                                                .font(.system(.subheadline))
+                                                .foregroundStyle(Color(.secondaryLabel))
+                                            Text(month)
+                                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                                .foregroundStyle(Color(.label))
+                                            Spacer()
+                                            Text("\(tabsForMonth.count) tab\(tabsForMonth.count == 1 ? "" : "s")")
+                                                .font(.system(.caption, design: .rounded, weight: .medium))
+                                                .foregroundStyle(Color(.secondaryLabel))
+                                            Image(systemName: expandedMonths.contains(month) ? "chevron.down" : "chevron.right")
+                                                .font(.system(.caption))
+                                                .foregroundStyle(Color(.secondaryLabel))
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 14)
+                                                .fill(Color(.secondarySystemBackground))
+                                                .shadow(color: .black.opacity(0.04), radius: 4)
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .padding(.leading, 16) // indent under year
+
+                                    if expandedMonths.contains(month) {
+                                        LazyVStack(spacing: 16) {
+                                            ForEach(tabsForMonth) { $tab in
+                                                NavigationLink(value: tab.id) {
+                                                    TabCardView(tab: $tab)
+                                                }
+                                                .buttonStyle(.plain)
+                                                .padding(.horizontal)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.leading, 8)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    // MARK: - Date Helpers
+
     fileprivate func monthString(from date: Date) -> String {
         let f = DateFormatter()
         f.dateFormat = "MMMM yyyy"
@@ -251,6 +359,12 @@ extension HomeView {
         let f = DateFormatter()
         f.dateFormat = "MMMM yyyy"
         return f.date(from: string) ?? Date()
+    }
+
+    fileprivate func yearString(from date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy"
+        return f.string(from: date)
     }
 
     // MARK: - Empty State
