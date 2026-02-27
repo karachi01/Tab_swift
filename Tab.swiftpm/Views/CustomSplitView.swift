@@ -2,8 +2,6 @@
 //  CustomSplitView.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/24/26.
-//
 
 import SwiftUI
 
@@ -49,7 +47,7 @@ struct CustomSplitView: View {
             ScrollView {
                 VStack(spacing: 28) {
 
-                    // MARK: Header
+ 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Custom Split / Tip")
                             .font(.system(.largeTitle, design: .rounded, weight: .heavy))
@@ -61,7 +59,7 @@ struct CustomSplitView: View {
                     }
                     .padding(.horizontal)
 
-                    // MARK: Per-Person Inputs
+ 
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Individual Amounts")
                             .font(.headline)
@@ -137,7 +135,7 @@ struct CustomSplitView: View {
                         .padding(.horizontal)
                     }
 
-                    // MARK: Shared Tax
+
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Shared Tax (Optional)")
                             .font(.headline)
@@ -171,7 +169,7 @@ struct CustomSplitView: View {
                     }
                     .padding(.horizontal)
 
-                    // MARK: Summary
+
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Summary")
                             .font(.headline)
@@ -211,7 +209,7 @@ struct CustomSplitView: View {
                     )
                     .padding(.horizontal)
 
-                    // MARK: Confirm
+
                     Button {
                         isKeyboardFocused = false
                         for i in friends.indices {
@@ -244,8 +242,7 @@ struct CustomSplitView: View {
                 }
                 .padding(.top)
             }
-            // Prevents the floating mini keyboard on iPad — forces the
-            // full docked keyboard instead of the compact floating one
+
             .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Custom Split")

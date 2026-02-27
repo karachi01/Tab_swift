@@ -2,8 +2,7 @@
 //  TabCardView.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
-//
+
 
 import SwiftUI
 import UIKit
@@ -14,13 +13,17 @@ struct TabCardView: View {
 
     private let cornerRadius: CGFloat = 20
 
+    private var headerHeight: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .pad ? 200 : 140
+    }
+
     var body: some View {
         VStack(spacing: 0) {
 
-            // MARK: Header
+
             ZStack(alignment: .bottomLeading) {
                 visualHeader
-                    .frame(height: 140)
+                    .frame(height: headerHeight)
                     .frame(maxWidth: .infinity)
                     .clipped()
 
@@ -42,16 +45,14 @@ struct TabCardView: View {
                 .padding()
             }
 
-            // Divider line separating the visual header from the details.
-            // In dark mode this creates a crisp edge between the two sections;
-            // in light mode it's barely visible since the card is already white.
+
             Rectangle()
                 .fill(colorScheme == .dark
                       ? Color(red: 70/255, green: 140/255, blue: 125/255).opacity(0.35)
                       : Color(.separator).opacity(0.2))
                 .frame(height: 1)
 
-            // MARK: Details
+
             VStack(alignment: .leading, spacing: 8) {
                 Text("Total Amount")
                     .font(.system(.caption, design: .rounded, weight: .medium))
@@ -77,8 +78,7 @@ struct TabCardView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
         )
-        // In dark mode add a subtle teal-tinted border so the card has
-        // definition against the secondarySystemBackground page
+
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .stroke(
@@ -89,9 +89,10 @@ struct TabCardView: View {
                 )
         )
         .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .padding(.bottom, UIDevice.current.userInterfaceIdiom == .pad ? 8 : 0)
     }
 
-    // MARK: Visual Header
+
     @ViewBuilder
     private var visualHeader: some View {
         if let data = tab.imageData,
@@ -107,8 +108,7 @@ struct TabCardView: View {
                 .padding(30)
                 .foregroundStyle(Color(red: 70/255, green: 140/255, blue: 125/255))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                // Slightly different background in dark vs light so the icon
-                // area reads as visually separate from the details below
+
                 .background(colorScheme == .dark
                             ? Color(.systemGray5)
                             : Color(.systemGray6))

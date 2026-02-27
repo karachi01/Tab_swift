@@ -2,7 +2,6 @@
 //  IntroView.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
 //
 
 import SwiftUI
@@ -43,8 +42,7 @@ struct IntroView: View {
             VStack(spacing: 32) {
                 Spacer()
 
-                // App icon displayed inside a circle bubble.
-                // Replace "TabIcon" with the exact name of your image asset.
+
                 ZStack {
                     Circle()
                         .fill(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white.opacity(0.7))

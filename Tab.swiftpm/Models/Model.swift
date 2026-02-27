@@ -2,12 +2,11 @@
 //  Model.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
-//
+
 
 import Foundation
 
-// MARK: - Friend model
+
 struct Friend: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
@@ -36,7 +35,7 @@ struct Friend: Identifiable, Hashable, Codable {
     }
 }
 
-// MARK: - Tab model
+
 struct Tab: Identifiable, Hashable, Codable {
     let id: UUID
     var restaurantName: String

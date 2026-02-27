@@ -2,8 +2,7 @@
 //  TabManager.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
-//
+
 
 import SwiftUI
 
@@ -20,7 +19,7 @@ class TabManager: ObservableObject {
         loadTabs()
     }
 
-    // MARK: - Public Actions
+
 
     func update(tab: Tab) {
         var updatedTab = tab
@@ -41,14 +40,14 @@ class TabManager: ObservableObject {
         tabs[index].isSettled = true
     }
 
-    // ✅ NEW: Move Settled → Active
+ 
     func markTabActive(tabID: UUID) {
         guard let index = tabs.firstIndex(where: { $0.id == tabID }) else { return }
         tabs[index].isSettled = false
     }
 
 
-    // MARK: - Persistence
+
 
     private func saveTabs() {
         do {

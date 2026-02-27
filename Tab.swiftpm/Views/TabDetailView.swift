@@ -2,8 +2,7 @@
 //  TabDetailView.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
-//
+
 
 import SwiftUI
 import MapKit
@@ -18,7 +17,7 @@ struct TabDetailView: View {
     @State private var showSettledCheck = false
     @State private var showDeleteConfirmation = false
 
-    // Taller hero on iPad to match the visual weight of the iPhone view
+
     private var heroHeight: CGFloat {
         UIDevice.current.userInterfaceIdiom == .pad ? 380 : 240
     }
@@ -36,7 +35,7 @@ struct TabDetailView: View {
                 ScrollView {
                     VStack(spacing: 20) {
 
-                        // MARK: Hero Visual
+  
                         ZStack(alignment: .bottomLeading) {
                             heroVisual(tab: tab)
                                 .frame(maxWidth: .infinity)
@@ -64,7 +63,7 @@ struct TabDetailView: View {
                         .padding(.horizontal)
                         .shadow(color: .black.opacity(0.12), radius: 10, y: 5)
 
-                        // MARK: Breakdown Card
+
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Breakdown")
                                 .font(.system(.title3, design: .rounded, weight: .semibold))
@@ -127,7 +126,7 @@ struct TabDetailView: View {
                             }
                         }
 
-                        // MARK: Total Card
+
                         HStack {
                             Text("Total")
                                 .font(.system(.headline, design: .rounded))
@@ -143,7 +142,7 @@ struct TabDetailView: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         .padding(.horizontal)
 
-                        // MARK: Settle / Active Toggle
+
                         Button(action: {
                             let generator = UINotificationFeedbackGenerator()
                             generator.notificationOccurred(.success)
@@ -191,7 +190,7 @@ struct TabDetailView: View {
                         .disabled(isSettling)
                         .padding(.horizontal)
 
-                        // MARK: Edit
+
                         Button {
                             path.append(EditTabPath(tabID: tabID))
                         } label: {
@@ -205,7 +204,7 @@ struct TabDetailView: View {
                                 .padding(.horizontal)
                         }
 
-                        // MARK: Delete
+
                         Button {
                             showDeleteConfirmation = true
                         } label: {

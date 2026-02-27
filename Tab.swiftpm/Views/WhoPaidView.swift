@@ -41,8 +41,7 @@ struct WhoPaidView: View {
                 }
                 .padding(.bottom, 30)
             }
-            // Prevents the floating mini keyboard on iPad by telling the
-            // scroll view to work with the docked keyboard instead
+
             .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Bill Split")
@@ -67,7 +66,7 @@ struct WhoPaidView: View {
         }
     }
 
-    // MARK: Header
+
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Who Paid?")
@@ -81,7 +80,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Bill Inputs
+
     private var billInputSection: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
@@ -147,7 +146,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Who Paid Section
+
     private var whoPaidSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Who Paid?")
@@ -193,7 +192,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Split Buttons Section
+
     private var splitButtonsSection: some View {
         VStack(spacing: 12) {
             GradientButton(title: "Split Equally") {
@@ -208,7 +207,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Summary Section
+
     private var summarySection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Summary")
@@ -244,7 +243,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Confirm Button
+
     private var confirmButton: some View {
         Button {
             focusedField = nil
@@ -276,7 +275,7 @@ struct WhoPaidView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Helpers
+ 
     private var canConfirm: Bool {
         Double(totalBill) != nil && payerID != nil
     }
@@ -322,7 +321,6 @@ struct WhoPaidView: View {
     }
 }
 
-// MARK: - Reusable Components
 
 struct BillInputField: View {
     let title: String

@@ -3,11 +3,7 @@
 //  OutingDraft.swift
 //  Tab
 //
-//  Holds in-progress state for the outing creation flow.
-//  Injected as an environment object so every step in
-//  Create → AddFriends → WhoPaid can read/write shared state
-//  without fragile @Binding chains through NavigationLink(destination:).
-//
+
 
 import SwiftUI
 import UIKit
@@ -20,8 +16,7 @@ class OutingDraft: ObservableObject {
     @Published var selectedIcon: String?
     @Published var friends: [Friend] = [Friend(name: "You", isYou: true)]
 
-    /// Call when the user finishes or cancels the creation flow
-    /// to prepare for the next one.
+
     func reset() {
         locationName = ""
         outingDate = .now

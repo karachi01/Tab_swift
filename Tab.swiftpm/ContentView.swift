@@ -10,7 +10,7 @@ struct ContentView: View {
     @StateObject private var draft = OutingDraft()
     @State private var path = NavigationPath()
 
-    // Global toast state
+
     @State private var showToast = false
     @State private var toastMessage = ""
 
@@ -64,7 +64,7 @@ struct ContentView: View {
             .environmentObject(tabManager)
             .environmentObject(draft)
 
-            // MARK: - GLOBAL TOAST OVERLAY
+ 
             VStack {
                 if showToast {
                     Text(toastMessage)

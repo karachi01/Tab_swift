@@ -2,8 +2,7 @@
 //  EditTabView.swift
 //  Tab
 //
-//  Created by Karachi Onwuanibe on 1/12/26.
-//
+
 
 import SwiftUI
 
@@ -67,7 +66,7 @@ struct EditTabView: View {
         }
     }
 
-    // MARK: Header
+
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Edit Tab")
@@ -81,11 +80,11 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Bill Inputs
+
     private var billInputSection: some View {
         VStack(spacing: 16) {
 
-            // Total Bill
+  
             VStack(alignment: .leading, spacing: 6) {
                 Text("Total Bill")
                     .font(.caption)
@@ -106,7 +105,6 @@ struct EditTabView: View {
                 )
             }
 
-            // Tax
             VStack(alignment: .leading, spacing: 6) {
                 Text("Tax (optional)")
                     .font(.caption)
@@ -127,7 +125,6 @@ struct EditTabView: View {
                 )
             }
 
-            // Tip
             VStack(alignment: .leading, spacing: 6) {
                 Text("Tip")
                     .font(.caption)
@@ -151,7 +148,7 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Who Paid Section
+
     private var whoPaidSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Who Paid?")
@@ -199,7 +196,7 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Split Buttons Section
+
     private var splitButtonsSection: some View {
         VStack(spacing: 12) {
             GradientButton(title: "Split Equally") {
@@ -214,7 +211,7 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Summary Section
+
     private var summarySection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Summary")
@@ -252,7 +249,7 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Save Button
+ 
     private var saveButton: some View {
         Button {
             focusedField = nil
@@ -284,7 +281,6 @@ struct EditTabView: View {
         .padding(.horizontal)
     }
 
-    // MARK: Helpers
     private var canConfirm: Bool {
         Double(totalBill) != nil && payerID != nil
     }

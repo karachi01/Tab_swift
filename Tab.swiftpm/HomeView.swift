@@ -65,7 +65,7 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Section Content
+
 
 extension HomeView {
 
@@ -105,7 +105,7 @@ extension HomeView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    // MARK: - Data
+
 
     fileprivate func filteredTabs(for section: HomeTabSection) -> [Binding<Tab>] {
         switch section {
@@ -116,7 +116,7 @@ extension HomeView {
         }
     }
 
-    // MARK: - Header
+
 
     fileprivate func sectionHeader(for section: HomeTabSection) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -143,7 +143,7 @@ extension HomeView {
         .padding(.horizontal)
     }
 
-    // MARK: - View Toggle
+
 
     fileprivate var viewToggle: some View {
         HStack {
@@ -171,7 +171,7 @@ extension HomeView {
         .padding(.horizontal)
     }
 
-    // MARK: - Monthly Folders
+
 
     fileprivate func monthlyFolders(for section: HomeTabSection) -> some View {
         let tabs = filteredTabs(for: section)
@@ -233,7 +233,7 @@ extension HomeView {
         }
     }
 
-    // MARK: - Yearly Folders
+ 
 
     fileprivate func yearlyFolders(for section: HomeTabSection) -> some View {
         let tabs = filteredTabs(for: section)
@@ -247,7 +247,7 @@ extension HomeView {
                 let tabsForYear = grouped[year] ?? []
 
                 VStack(alignment: .leading, spacing: 8) {
-                    // Year folder header
+
                     Button {
                         if expandedYears.contains(year) {
                             expandedYears.remove(year)
@@ -277,7 +277,6 @@ extension HomeView {
                     }
                     .buttonStyle(.plain)
 
-                    // When expanded, show month sub-folders within the year
                     if expandedYears.contains(year) {
                         let monthGrouped = Dictionary(grouping: tabsForYear) {
                             monthString(from: $0.wrappedValue.date)
@@ -291,7 +290,7 @@ extension HomeView {
                                 let tabsForMonth = monthGrouped[month] ?? []
 
                                 VStack(alignment: .leading, spacing: 8) {
-                                    // Month sub-folder header
+                                    
                                     Button {
                                         if expandedMonths.contains(month) {
                                             expandedMonths.remove(month)
@@ -323,7 +322,7 @@ extension HomeView {
                                         )
                                     }
                                     .buttonStyle(.plain)
-                                    .padding(.leading, 16) // indent under year
+                                    .padding(.leading, 16)
 
                                     if expandedMonths.contains(month) {
                                         LazyVStack(spacing: 16) {
@@ -347,7 +346,7 @@ extension HomeView {
         }
     }
 
-    // MARK: - Date Helpers
+
 
     fileprivate func monthString(from date: Date) -> String {
         let f = DateFormatter()
@@ -367,7 +366,7 @@ extension HomeView {
         return f.string(from: date)
     }
 
-    // MARK: - Empty State
+
 
     fileprivate func emptyState(for section: HomeTabSection) -> some View {
         VStack(spacing: 16) {
@@ -425,7 +424,7 @@ extension HomeView {
         .padding(.horizontal)
     }
 
-    // MARK: - Tabs Timeline
+
 
     fileprivate func tabsTimeline(for section: HomeTabSection) -> some View {
         let tabs = filteredTabs(for: section)
@@ -469,7 +468,7 @@ extension HomeView {
         }
     }
 
-    // MARK: - FAB
+
 
     fileprivate var fabButton: some View {
         Button {

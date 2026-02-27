@@ -33,13 +33,17 @@ struct CreateOutingView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 24) {
 
-                        // MARK: Visual Display
+
                         Group {
                             if let image = draft.selectedImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 220)
+                                    .frame(
+                                        height: UIDevice.current.userInterfaceIdiom == .pad
+                                            ? 380
+                                            : 220
+                                    )
                                     .clipShape(
                                         RoundedRectangle(cornerRadius: 20)
                                     )
@@ -49,7 +53,6 @@ struct CreateOutingView: View {
                                         y: 4
                                     )
                                     .onTapGesture { showImagePicker = true }
-
                             } else if let iconName = draft.selectedIcon {
                                 Image(systemName: iconName)
                                     .resizable()
@@ -81,7 +84,7 @@ struct CreateOutingView: View {
                         }
                         .padding(.top, 40)
 
-                        // MARK: Icon Picker
+
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 16) {
                                 ForEach(icons.indices, id: \.self) { index in
@@ -103,7 +106,7 @@ struct CreateOutingView: View {
                             .padding(.horizontal)
                         }
 
-                        // MARK: Location Input
+
                         HStack(spacing: 10) {
                             Image(systemName: "pencil.circle.fill")
                                 .foregroundStyle(
@@ -141,7 +144,6 @@ struct CreateOutingView: View {
                         )
                         .padding(.horizontal)
 
-                        // MARK: Date Picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Outing Date")
                                 .font(
@@ -182,7 +184,7 @@ struct CreateOutingView: View {
                     }
                 }
 
-                // MARK: Continue — pinned to bottom
+ 
                 Button {
                     path.append("addFriends")
                 } label: {
@@ -293,7 +295,7 @@ struct IconButton: View {
             .foregroundStyle(
                 isSelected
                     ? Color(red: 70 / 255, green: 140 / 255, blue: 125 / 255)
-                    // Light mode: original teal. Dark mode: secondaryLabel for legibility
+
                     : (colorScheme == .dark
                         ? Color(.secondaryLabel)
                         : Color(

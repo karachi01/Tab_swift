@@ -26,7 +26,7 @@ struct AddFriendsView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 24) {
 
-                        // MARK: Header
+
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Add Friends")
                                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
@@ -38,7 +38,7 @@ struct AddFriendsView: View {
                         }
                         .padding(.horizontal)
 
-                        // MARK: Friends chips
+
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(draft.friends) { friend in
@@ -69,7 +69,7 @@ struct AddFriendsView: View {
                         }
                         .frame(height: 44)
 
-                        // MARK: Input Fields
+
                         VStack(spacing: 12) {
                             TextField("Friend's Name", text: $newFriendName)
                                 .padding()
@@ -120,7 +120,6 @@ struct AddFriendsView: View {
                     .padding(.top)
                 }
 
-                // MARK: Continue — pinned, keyboard slides over
                 Button {
                     isKeyboardFocused = false
                     path.append("whoPaid")
@@ -145,7 +144,7 @@ struct AddFriendsView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 24)
                 .padding(.top, 12)
-                // Use systemBackground so the pinned button area matches the screen in both modes
+
                 .background(Color(.systemBackground))
             }
         }
