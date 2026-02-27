@@ -15,7 +15,6 @@ struct AddFriendsView: View {
     @State private var newFriendName: String = ""
     @State private var newFriendContact: String = ""
     @FocusState private var isKeyboardFocused: Bool
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
@@ -30,11 +29,11 @@ struct AddFriendsView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Add Friends")
                                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
-                                .foregroundStyle(colorScheme == .dark ? Color.white : Color(red: 30/255, green: 60/255, blue: 55/255))
+                                .foregroundStyle(Color(.label))
 
                             Text("Add friends and optionally their contact info for reminders.")
                                 .font(.system(.body, design: .rounded, weight: .medium))
-                                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.7) : Color(red: 90/255, green: 120/255, blue: 110/255))
+                                .foregroundStyle(Color(.secondaryLabel))
                         }
                         .padding(.horizontal)
 
@@ -43,15 +42,25 @@ struct AddFriendsView: View {
                             HStack(spacing: 12) {
                                 ForEach(draft.friends) { friend in
                                     HStack(spacing: 6) {
-                                        Text(friend.isYou ? "You" : friend.name)
-                                            .lineLimit(1)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                    .fill(friend.isYou ? Color.green.opacity(0.25) : Color.blue.opacity(0.2))
-                                            )
-                                            .foregroundStyle(friend.isYou ? .green : .blue)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(friend.isYou ? "You" : friend.name)
+                                                .lineLimit(1)
+                                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                                .foregroundStyle(friend.isYou ? .green : .blue)
+
+                                            if let contact = friend.contactInfo, !contact.isEmpty {
+                                                Text(contact)
+                                                    .lineLimit(1)
+                                                    .font(.system(.caption, design: .rounded, weight: .medium))
+                                                    .foregroundStyle(friend.isYou ? Color.green.opacity(0.8) : Color.blue.opacity(0.8))
+                                            }
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(friend.isYou ? Color.green.opacity(0.15) : Color.blue.opacity(0.12))
+                                        )
 
                                         if !friend.isYou {
                                             Button {
@@ -67,22 +76,11 @@ struct AddFriendsView: View {
                             }
                             .padding(.horizontal)
                         }
-                        .frame(height: 44)
+                        .frame(height: 60)
 
-
-                        VStack(spacing: 12) {
+ 
+                        VStack(spacing: 20) {
                             TextField("Friend's Name", text: $newFriendName)
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(Color(.secondarySystemBackground))
-                                        .shadow(color: Color.black.opacity(0.06), radius: 6, y: 3)
-                                )
-                                .font(.system(.callout, design: .rounded, weight: .medium))
-                                .foregroundStyle(Color(.label))
-                                .focused($isKeyboardFocused)
-
-                            TextField("Email or Phone (optional)", text: $newFriendContact)
                                 .padding()
                                 .background(
                                     RoundedRectangle(cornerRadius: 16)
@@ -119,6 +117,7 @@ struct AddFriendsView: View {
                     }
                     .padding(.top)
                 }
+
 
                 Button {
                     isKeyboardFocused = false
