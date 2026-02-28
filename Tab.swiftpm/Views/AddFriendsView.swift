@@ -7,6 +7,10 @@ import SwiftUI
 import CoreLocation
 import UIKit
 
+enum AddFriendsField {
+    case name
+}
+
 struct AddFriendsView: View {
     @EnvironmentObject var draft: OutingDraft
     @EnvironmentObject var tabManager: TabManager
@@ -14,7 +18,9 @@ struct AddFriendsView: View {
 
     @State private var newFriendName: String = ""
     @State private var newFriendContact: String = ""
-    @FocusState private var isKeyboardFocused: Bool
+    // Typed FocusState avoids the iPad floating-keyboard issue that a plain
+    // Bool @FocusState can trigger
+    @FocusState private var focusedField: AddFriendsField?
 
     var body: some View {
         ZStack {
@@ -23,44 +29,35 @@ struct AddFriendsView: View {
 
             VStack(spacing: 0) {
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 16) {
 
-
+                        // MARK: Header
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Add Friends")
                                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                                 .foregroundStyle(Color(.label))
 
-                            Text("Add friends and optionally their contact info for reminders.")
+                            Text("Who are you splitting with?")
                                 .font(.system(.body, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.secondaryLabel))
                         }
                         .padding(.horizontal)
 
-
+                        // MARK: Friends chips
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(draft.friends) { friend in
                                     HStack(spacing: 6) {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(friend.isYou ? "You" : friend.name)
-                                                .lineLimit(1)
-                                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                                .foregroundStyle(friend.isYou ? .green : .blue)
-
-                                            if let contact = friend.contactInfo, !contact.isEmpty {
-                                                Text(contact)
-                                                    .lineLimit(1)
-                                                    .font(.system(.caption, design: .rounded, weight: .medium))
-                                                    .foregroundStyle(friend.isYou ? Color.green.opacity(0.8) : Color.blue.opacity(0.8))
-                                            }
-                                        }
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(friend.isYou ? Color.green.opacity(0.15) : Color.blue.opacity(0.12))
-                                        )
+                                        Text(friend.isYou ? "You" : friend.name)
+                                            .lineLimit(1)
+                                            .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                            .foregroundStyle(friend.isYou ? .green : .blue)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .fill(friend.isYou ? Color.green.opacity(0.15) : Color.blue.opacity(0.12))
+                                            )
 
                                         if !friend.isYou {
                                             Button {
@@ -76,9 +73,9 @@ struct AddFriendsView: View {
                             }
                             .padding(.horizontal)
                         }
-                        .frame(height: 60)
+                        .frame(height: 50)
 
- 
+                        // MARK: Input + Add button
                         VStack(spacing: 20) {
                             TextField("Friend's Name", text: $newFriendName)
                                 .padding()
@@ -89,7 +86,10 @@ struct AddFriendsView: View {
                                 )
                                 .font(.system(.callout, design: .rounded, weight: .medium))
                                 .foregroundStyle(Color(.label))
-                                .focused($isKeyboardFocused)
+                                // Typed focus — no floating keyboard on iPad
+                                .focused($focusedField, equals: .name)
+                                .submitLabel(.done)
+                                .onSubmit { addFriend() }
 
                             Button(action: addFriend) {
                                 Text("Add Friend")
@@ -110,17 +110,22 @@ struct AddFriendsView: View {
                                     .cornerRadius(16)
                                     .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                             }
+                            // .plain keeps the gradient background visible and
+                            // prevents the system from swallowing the tap
+                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal)
 
                         Color.clear.frame(height: 20)
                     }
-                    .padding(.top)
+                    .padding(.top, 4)
                 }
+                .scrollDismissesKeyboard(.interactively)
+                .onTapGesture { focusedField = nil }
 
-
+                // MARK: Continue — pinned bottom
                 Button {
-                    isKeyboardFocused = false
+                    focusedField = nil
                     path.append("whoPaid")
                 } label: {
                     Text("Continue")
@@ -140,10 +145,10 @@ struct AddFriendsView: View {
                         .cornerRadius(16)
                         .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal)
                 .padding(.bottom, 24)
                 .padding(.top, 12)
-
                 .background(Color(.systemBackground))
             }
         }
@@ -153,19 +158,18 @@ struct AddFriendsView: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button("Done") { isKeyboardFocused = false }
+                Button("Done") { focusedField = nil }
             }
         }
-        .onTapGesture { isKeyboardFocused = false }
     }
 
     private func addFriend() {
         let trimmed = newFriendName.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         draft.friends.append(
-            Friend(name: trimmed, contactInfo: newFriendContact.isEmpty ? nil : newFriendContact)
+            Friend(name: trimmed, contactInfo: nil)
         )
         newFriendName = ""
-        newFriendContact = ""
+        // Keep keyboard open so user can quickly add another friend
     }
 }
